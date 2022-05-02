@@ -5,21 +5,20 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("BlogDbContextConnection");
-builder.Services.AddDbContext<BlogDbContext>(options =>
-    options.UseSqlServer(connectionString));;
-
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-    .AddEntityFrameworkStores<BlogDbContext>();;
-;
 
 builder.Services.AddDbContext<BlogDbContext>(options =>
-    options.UseSqlServer(connectionString));;
+    options.UseSqlServer(connectionString));
 
 builder.Services.AddDefaultIdentity<BlogUser>(options => options.SignIn.RequireConfirmedAccount = true)
-    .AddEntityFrameworkStores<BlogDbContext>();;
+    .AddRoles<IdentityRole>()
+    .AddEntityFrameworkStores<BlogDbContext>();
+
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+// Add AutoMapper
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 
 builder.Services.Configure<IdentityOptions>(options =>

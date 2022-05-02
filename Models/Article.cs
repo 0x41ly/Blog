@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Blog.Areas.Identity.Data;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Blog.Models
@@ -8,14 +9,14 @@ namespace Blog.Models
         [Key]
         [Column(Order = 0)]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public Guid Id { get; set; }
+        public Guid ArticleId { get; set; }
 
         [Required, MaxLength(50)]
         public string Title { get; set; }
         [Required, MaxLength(50)]
-        [ForeignKey("Standard")]
-        public String Genre { get; set; }
-        [Required, MaxLength(10)]
+        
+        public String GenreName { get; set; }
+        [Required]
         public String Catagories { get; set; }
         [Required, MaxLength(15)]
         public String Level { get; set; }
@@ -27,12 +28,20 @@ namespace Blog.Models
         public DateTime LastUpdated { get; set; }
         [Required]
         public String Content { get; set; }
-        public String CreatorId { get; set; }
-        public List<Comment> comments = new();
-        public int Views { get; set; }
-        public List<Like> Likes = new();
-        public int LikesCount { get; set; }
-        public bool IsPremium { get; set; }
+        [Required]
+        public String Description { get; set; }
+        
+        [MaxLength(450)]
+        public String AuthorId { get; set; }
+        public bool Recommended { get; set; }
+
+        public virtual BlogUser Author { get; set; }
+        
+        public virtual List<Comment> MainComments { get; set; }
+        
+  /*      public virtual ICollection<ArticleLike> ArticleLikes { get; set; }
+        
+        public virtual ICollection<View> Views { get; set; }*/
 
     }
 }

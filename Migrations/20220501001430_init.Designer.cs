@@ -4,6 +4,7 @@ using Blog.Areas.Identity.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Blog.Migrations
 {
     [DbContext(typeof(BlogDbContext))]
-    partial class BlogDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220501001430_init")]
+    partial class init
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -219,8 +221,6 @@ namespace Blog.Migrations
 
                     b.HasIndex("CreatorId");
 
-                    b.HasIndex("ParentId");
-
                     b.ToTable("Comments");
                 });
 
@@ -425,12 +425,6 @@ namespace Blog.Migrations
                         .WithMany()
                         .HasForeignKey("CreatorId");
 
-                    b.HasOne("Blog.Models.Comment", null)
-                        .WithMany("SubComments")
-                        .HasForeignKey("ParentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Article");
 
                     b.Navigation("Creator");
@@ -512,11 +506,6 @@ namespace Blog.Migrations
             modelBuilder.Entity("Blog.Models.Article", b =>
                 {
                     b.Navigation("MainComments");
-                });
-
-            modelBuilder.Entity("Blog.Models.Comment", b =>
-                {
-                    b.Navigation("SubComments");
                 });
 #pragma warning restore 612, 618
         }
