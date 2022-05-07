@@ -145,11 +145,18 @@ namespace Blog.Data.Repository
             ArticleViewModel.Genres = GetGenres();
             ArticleViewModel.Article = GetArticle(id);
             ArticleViewModel.ArticleLikes = GetArticleLikes(id);
+            ArticleViewModel.ArticleViews = GetArticleViews(id);
             ArticleViewModel.Author = GetUserProfile(ArticleViewModel.Article.AuthorId);
             ArticleViewModel.SideBarArticles = GetSideBarArticles(ArticleViewModel.Article.GenreName);
             ArticleViewModel.MainComments = GetComments(id, 0);                                        
                                                    
             return ArticleViewModel;
+        }
+
+        private int GetArticleViews(Guid id)
+        {
+            return _ctx.Views
+                    .Where(a => a.ArticleId == id).ToList().Count();
         }
 
         private List<string> GetGenres()
