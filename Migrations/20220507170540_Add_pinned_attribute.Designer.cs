@@ -4,6 +4,7 @@ using Blog.Areas.Identity.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Blog.Migrations
 {
     [DbContext(typeof(BlogDbContext))]
-    partial class BlogDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220507170540_Add_pinned_attribute")]
+    partial class Add_pinned_attribute
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -242,36 +244,6 @@ namespace Blog.Migrations
                     b.ToTable("CommentLikes");
                 });
 
-            modelBuilder.Entity("Blog.Models.PinnedArticles", b =>
-                {
-                    b.Property<Guid>("ArticleId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasIndex("ArticleId");
-
-                    b.ToTable("PinnedArticles");
-                });
-
-            modelBuilder.Entity("Blog.Models.RecommenedBy", b =>
-                {
-                    b.Property<Guid>("ArticleId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasIndex("ArticleId");
-
-                    b.ToTable("RecommendedBy");
-                });
-
             modelBuilder.Entity("Blog.Models.View", b =>
                 {
                     b.Property<Guid>("ArticleId")
@@ -480,28 +452,6 @@ namespace Blog.Migrations
                         .IsRequired();
 
                     b.Navigation("Comment");
-                });
-
-            modelBuilder.Entity("Blog.Models.PinnedArticles", b =>
-                {
-                    b.HasOne("Blog.Models.Article", "Article")
-                        .WithMany()
-                        .HasForeignKey("ArticleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Article");
-                });
-
-            modelBuilder.Entity("Blog.Models.RecommenedBy", b =>
-                {
-                    b.HasOne("Blog.Models.Article", "Article")
-                        .WithMany()
-                        .HasForeignKey("ArticleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Article");
                 });
 
             modelBuilder.Entity("Blog.Models.View", b =>

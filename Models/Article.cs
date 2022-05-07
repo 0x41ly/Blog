@@ -30,10 +30,11 @@ namespace Blog.Models
         public String Content { get; set; }
         [Required]
         public String Description { get; set; }
-        
+        public bool Pinned { get; set; }
+        public bool Recommended { get; set; }
         [MaxLength(450)]
         public String AuthorId { get; set; }
-        public bool Recommended { get; set; }
+        
 
         public virtual BlogUser Author { get; set; }
         

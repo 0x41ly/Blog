@@ -3,6 +3,8 @@ using Blog.Models;
 using Blog.ViewModels;
 using Microsoft.EntityFrameworkCore;
 using AutoMapper;
+using Microsoft.AspNetCore.Identity;
+
 
 namespace Blog.Data.Repository
 {
@@ -10,11 +12,15 @@ namespace Blog.Data.Repository
     {
         private BlogDbContext _ctx;
         private readonly IMapper _mapper;
+        private readonly UserManager<BlogUser> _userManager;
 
-        public Repository(BlogDbContext ctx, IMapper mapper)
+        public Repository(BlogDbContext ctx,
+            IMapper mapper,
+            UserManager<BlogUser> userManager)
         {
             _ctx = ctx;
             _mapper = mapper;
+            _userManager = userManager;
         }
         
 
@@ -25,10 +31,11 @@ namespace Blog.Data.Repository
 
 
 
-        public IndexViewModel GetAllArticles(
+        public IndexViewModel GetIndexViewModel(
             int pageNumber,
             string category,
-            string search)
+            string search,
+            string UserId)
         {
             
 
@@ -56,14 +63,82 @@ namespace Blog.Data.Repository
                 PageCount = pageCount,
                 NextPage = pageNumber < pageCount,
                 PreviousPage = pageNumber > 1,
-                Pages = GetPageNumbers(pageNumber,pageCount),
+                Pages = GetPageNumbers(pageNumber, pageCount),
                 Category = category,
                 Search = search,
-                Articles = query
-                    .Skip(skipAmount)
+                RecommendedArticles = GetRecommenedArticles(),
+                Articles = (List<FrontArticleView>) query
+                    .Select(x => new FrontArticleView
+                    {
+                        Id = x.ArticleId,
+                        Title = x.Title,
+                        Description = x.Description
+                    })
+                    .Skip(articlesCount)
                     .Take(pageSize)
-                    .ToList()
+                    .ToList(),
+                PinnedArticles = GetPinnedArticles(UserId)
+
             };
+        }
+
+        private IEnumerable<FrontArticleView> GetPinnedArticles(string UserId)
+        {
+            var AdminPinnedArticles = _ctx.Articles
+                .Where(x => x.Pinned)
+                .Select(x => new FrontArticleView
+                {
+                    Id = x.ArticleId,
+                    Title = x.Title,
+                    Description = x.Description
+                }).ToList();
+
+            var UserPinnedArticles = new List<FrontArticleView>();
+            if (UserId != null)
+            {
+                var UserPinnedArticlesId = _ctx.PinnedArticles
+                                            .Where(x => x.UserId == UserId)
+                                            .Select(i => new PinnedArticles {
+                                                ArticleId = i.ArticleId   
+                                            });
+                foreach (var UserPinnedArticle in UserPinnedArticlesId)
+                {
+                    UserPinnedArticles.Add(GetFrontArticleViewById(UserPinnedArticle.ArticleId));
+                }
+            }
+
+            var PinnedArticles = AdminPinnedArticles.Union(UserPinnedArticles).ToList();
+            return PinnedArticles;
+        }
+
+        private IEnumerable<FrontArticleView> GetRecommenedArticles()
+        {
+           var RecommendedArticlesId = _ctx.RecommendedBy
+                                .GroupBy(e => e.ArticleId)
+                                .Select(i => new RecommendedBy
+                                { 
+                                    ArticleId = i.Key,
+                                    Count = i.Count()
+                                })
+                                .Where(a => a.Count >= _userManager.Users.Count()/2).ToList();
+            var RecommendedArticles = new List<FrontArticleView>();
+            foreach (var article in RecommendedArticlesId)
+            {
+                RecommendedArticles.Add(GetFrontArticleViewById(article.ArticleId));
+            }
+            return RecommendedArticles;
+        }
+
+        private FrontArticleView GetFrontArticleViewById(Guid articleId)
+        {
+            return (FrontArticleView)_ctx.Articles
+                .Where(a => a.ArticleId == articleId)
+                .Select(x => new FrontArticleView
+                {
+                    Id = x.ArticleId,
+                    Title = x.Title,
+                    Description = x.Description
+                });
         }
 
         private bool ContainCatagory(string catagories, string catagory)
@@ -220,6 +295,42 @@ namespace Blog.Data.Repository
                         Title = x.Title,
                         Description = x.Description
                     }).ToList();
+        }
+
+        public void AddView(Guid ArticleId, string UserId)
+        {
+            
+            if (!_ctx.Views.Any(e => e.ArticleId == ArticleId & e.UserId == UserId))
+            {
+                _ctx.Views.Add(new View { ArticleId = ArticleId, UserId = UserId });
+            }
+            
+        }
+
+        public void AddArticleLike(Guid ArticleId, string UserId)
+        {
+            var ArticleLike = new ArticleLike { ArticleId = ArticleId, UserId = UserId };
+            if (!_ctx.ArticleLikes.Any(e => e.ArticleId == ArticleId & e.UserId == UserId))
+            {
+                _ctx.ArticleLikes.Add(ArticleLike);
+            }
+            else
+            {
+                _ctx.ArticleLikes.Remove(ArticleLike);
+            }
+        }
+
+        public void AddCommentLike(Guid CommentId, string UserId)
+        {
+            var CommentLike = new CommentLike { CommentId = CommentId, UserId = UserId }; 
+            if (_ctx.CommentLikes.Any(e => e.CommentId == CommentId & e.UserId == UserId))
+            {
+                _ctx.CommentLikes.Add(CommentLike);
+            }
+            else
+            {
+                _ctx.CommentLikes.Remove(CommentLike);
+            }
         }
     }
 }

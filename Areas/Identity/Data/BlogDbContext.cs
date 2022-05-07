@@ -27,6 +27,8 @@ public class BlogDbContext : IdentityDbContext<BlogUser>
     public DbSet<CommentLike> CommentLikes { get; set; }
 
     public DbSet<View> Views { get; set; }
+    public DbSet<RecommendedBy> RecommendedBy { get; set; }
+    public DbSet<PinnedArticles> PinnedArticles { get; set; }
 
 
 }
