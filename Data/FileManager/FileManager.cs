@@ -1,9 +1,4 @@
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
 using PhotoSauce.MagicScaler;
-using System;
-using System.IO;
-using System.Threading.Tasks;
 
 namespace Blog.Data.FileManager
 {

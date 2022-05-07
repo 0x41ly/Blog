@@ -1,5 +1,4 @@
 using Blog.Models;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,13 +20,13 @@ public class BlogDbContext : IdentityDbContext<BlogUser>
         
 
     }
-    public DbSet<Blog.Models.Article> Articles { get; set; }
-    public DbSet<Blog.Models.Comment> Comments { get; set; }
-    public DbSet<Blog.Models.ArticleLike> ArticleLikes { get; set; }
+    public DbSet<Article> Articles { get; set; }
+    public DbSet<Comment> Comments { get; set; }
+    public DbSet<ArticleLike> ArticleLikes { get; set; }
     
-    public DbSet<Blog.Models.CommentLike> CommentLikes { get; set; }
+    public DbSet<CommentLike> CommentLikes { get; set; }
 
-    public DbSet<Blog.Models.View> Views { get; set; }
+    public DbSet<View> Views { get; set; }
 
 
 }

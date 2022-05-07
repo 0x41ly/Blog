@@ -1,5 +1,4 @@
 using Blog.Models;
-using System.Collections.Generic;
 
 namespace Blog.ViewModels
 {
@@ -9,11 +8,13 @@ namespace Blog.ViewModels
         public int PageCount { get; set; }
         public bool NextPage { get; set; }
         public bool PreviousPage { get; set; }
-        public string Genre { get; set; }
+        
         public string Search { get; set; }
-        public IEnumerable<ArticaleViewModel> RecommendedArticles { get; set; }
-        public IEnumerable<ArticaleViewModel> MostViewedArticles { get; set; }
-        public IEnumerable<ArticaleViewModel> Genres { get; set; }
+        public string Category { get; set; }
+        public IEnumerable<Article> RecommendedArticles { get; set; }
+        public IEnumerable<Article> MostViewedArticles { get; set; }
+        public IEnumerable<Article> Articles { get; set; }
+        public List<string> Genres { get; set; }
         public IEnumerable<int> Pages { get; internal set; }
     }
 }

@@ -7,8 +7,8 @@ namespace Blog.ViewModels
     {
        
         public Comment Comment { get; set; }
-        public BlogUser Author { get; set; }
-
-        public List<CommentViewModel> CommentViewModels { get; set; }
+        public UserProfile Creator { get; set; }
+        public int CommentLikes { get; set; }
+        public List<CommentViewModel>? SubComments { get; set; }
     }
 }
