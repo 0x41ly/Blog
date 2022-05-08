@@ -18,6 +18,7 @@ namespace Blog.Data.Repository
         void AddView(Guid ArticleId, string UserId);
         void AddArticleLike(Guid ArticleId, string UserId);
         void AddCommentLike(Guid CommentId, string UserId);
+        bool IsAllowedToPost(string UserId);
         Task<bool> SaveChangesAsync();
     }
 }

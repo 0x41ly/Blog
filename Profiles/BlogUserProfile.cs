@@ -19,7 +19,7 @@ public class BlogUserProfile : Profile
                 opt => opt.MapFrom(src => $"{src.Email}")
             )
             .ForMember(
-                dest => Convert.ToDateTime(dest.DOB),
+                dest => dest.DOB,
                 opt => opt.MapFrom(src => $"{src.DOB}")
             )
             .ForMember(

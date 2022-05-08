@@ -332,5 +332,15 @@ namespace Blog.Data.Repository
                 _ctx.CommentLikes.Remove(CommentLike);
             }
         }
+
+        public bool IsAllowedToPost(string UserId)
+        {
+            var MonthlyPostedArticles = _ctx.Articles
+                                            .Where(a => a.AuthorId == UserId & a.Created.ToString("MM/yyyy") == DateTime.Now.ToString("MM/yyyy"))
+                                            .ToList()
+                                            .Count();
+            return MonthlyPostedArticles < 2;
+            
+        }
     }
 }

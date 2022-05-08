@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Blog.Areas.Identity.Data;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Blog.Data.Repository;
+using Blog.Data.FileManager;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("BlogDbContextConnection");
@@ -13,7 +15,8 @@ builder.Services.AddDefaultIdentity<BlogUser>(options => options.SignIn.RequireC
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<BlogDbContext>();
 
-
+builder.Services.AddScoped<IRepository, Repository>();
+builder.Services.AddScoped<IFileManager, FileManager>();
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
