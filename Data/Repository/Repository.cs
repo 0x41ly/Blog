@@ -38,23 +38,32 @@ namespace Blog.Data.Repository
             string UserId)
         {
             
-
-            int pageSize = 5;
-            int skipAmount = pageSize * (pageNumber - 1);
+            
 
             var query = _ctx.Articles.AsNoTracking().AsQueryable();
 
             if (!String.IsNullOrEmpty(category))
-                query = query.Where(a => ContainCatagory(a.Catagories, category));
+                query = query.Where(a => ContainCatagory(a.Categories, category));
                                                         
 
             if (!String.IsNullOrEmpty(search))
                 query = query.Where(x => EF.Functions.Like(x.Title, $"%{search}%")
                                     || EF.Functions.Like(x.Content, $"%{search}%")
                                     || EF.Functions.Like(x.Description, $"%{search}%"));
-
+            int pageSize = 5;
             int articlesCount = query.Count();
             int pageCount = (int)Math.Ceiling((double)articlesCount / pageSize);
+            if (pageNumber < 1)
+            {
+                pageNumber = 1;
+            }
+            if (pageNumber > pageCount)
+            {
+                pageNumber = pageCount;
+            }
+            
+            int skipAmount = pageSize * (pageNumber - 1);
+            
 
             return new IndexViewModel
             {
@@ -77,9 +86,38 @@ namespace Blog.Data.Repository
                     .Skip(articlesCount)
                     .Take(pageSize)
                     .ToList(),
-                PinnedArticles = GetPinnedArticles(UserId)
+                PinnedArticles = GetPinnedArticles(UserId),
+                CategoriesCount = GetCategoriesCount()
 
             };
+        }
+
+        private List<CatagoryCountViewModel> GetCategoriesCount()
+        {
+            var categories = String.Join(',',_ctx.Articles
+                                .Select(x => x.Categories)
+                                .ToList())
+                                .Split(',')
+                                .Distinct();
+            var CategoriesCount = new List<CatagoryCountViewModel>();
+            foreach (var category in categories)
+            {
+                var categorycount = new CatagoryCountViewModel
+                {
+                    Category = category,
+                    Count = GetCategoryCount(category)
+                };
+                CategoriesCount.Add(categorycount);
+            }
+            return CategoriesCount;
+        }
+
+        private int GetCategoryCount(string category)
+        {
+            return _ctx.Articles
+                        .Where(a => ContainCatagory(a.Categories, category))
+                        .ToList()
+                        .Count();
         }
 
         private IEnumerable<FrontArticleView> GetPinnedArticles(string UserId)
@@ -115,12 +153,13 @@ namespace Blog.Data.Repository
         {
            var RecommendedArticlesId = _ctx.RecommendedBy
                                 .GroupBy(e => e.ArticleId)
-                                .Select(i => new RecommendedBy
+                                .Select(i => new 
                                 { 
                                     ArticleId = i.Key,
                                     Count = i.Count()
                                 })
-                                .Where(a => a.Count >= _userManager.Users.Count()/2).ToList();
+                                .Where(a => a.Count >= _userManager.Users.Count()/2)
+                                .ToList();
             var RecommendedArticles = new List<FrontArticleView>();
             foreach (var article in RecommendedArticlesId)
             {
@@ -341,6 +380,15 @@ namespace Blog.Data.Repository
                                             .Count();
             return MonthlyPostedArticles < 2;
             
+        }
+
+        public ArticleViewModel GetFirstArticleByGenre(string Genre)
+        {
+            var article = _ctx.Articles
+                .Where(a => a.GenreName == Genre)
+                .OrderBy(a => a.Created)
+                .ToList()[0];
+            return GetArticleViewModel(article.ArticleId);
         }
     }
 }

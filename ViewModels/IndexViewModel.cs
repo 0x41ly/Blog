@@ -15,6 +15,7 @@ namespace Blog.ViewModels
         public IEnumerable<FrontArticleView>? PinnedArticles { get; set; }
         public IEnumerable<FrontArticleView>? Articles { get; set; }
         public List<string>? Genres { get; set; }
+        public List<CatagoryCountViewModel>? CategoriesCount { get; set; }
         public IEnumerable<int>? Pages { get; internal set; }
     }
 }

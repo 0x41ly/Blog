@@ -17,7 +17,7 @@ namespace Blog.Models
         
         public String GenreName { get; set; }
         [Required]
-        public String Catagories { get; set; }
+        public String Categories { get; set; }
         [Required, MaxLength(15)]
         public String Level { get; set; }
         [DataType(DataType.Date)]

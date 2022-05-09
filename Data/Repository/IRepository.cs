@@ -19,6 +19,7 @@ namespace Blog.Data.Repository
         void AddArticleLike(Guid ArticleId, string UserId);
         void AddCommentLike(Guid CommentId, string UserId);
         bool IsAllowedToPost(string UserId);
+        ArticleViewModel GetFirstArticleByGenre(string Genre);
         Task<bool> SaveChangesAsync();
     }
 }

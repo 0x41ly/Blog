@@ -29,10 +29,11 @@ public class HomeController : Controller
         _fileManager = fileManager;
     }
 
-    public IActionResult Index()
+    public IActionResult Index(int pageNumber, string category, string search)
     {
-        
-        return View();
+
+        var vm = _repo.GetIndexViewModel(pageNumber, category, search, _userManager.GetUserId(User));
+        return View(vm);
     }
 
     public IActionResult Privacy()
