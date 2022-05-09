@@ -61,6 +61,39 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+var scope = app.Services.CreateScope();
+try
+{
+    var ctx = scope.ServiceProvider.GetRequiredService<BlogDbContext>();
+    var userMgr = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+    var roleMgr = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    ctx.Database.EnsureCreated();
+
+    var adminRole = new IdentityRole("Admin");
+    if (!ctx.Roles.Any())
+    {
+        //create a role
+        roleMgr.CreateAsync(adminRole).GetAwaiter().GetResult();
+    }
+    if (!ctx.Users.Any(u => u.UserName == "admin"))
+    {
+        //create an admin
+        var adminUser = new IdentityUser
+        {
+            UserName = "admin",
+            Email = "admin@blog.com"
+        };
+        var result = userMgr.CreateAsync(adminUser, "SiKiMiKi").GetAwaiter().GetResult();
+        //add role to user
+        userMgr.AddToRoleAsync(adminUser, adminRole.Name).GetAwaiter().GetResult();
+    }
+
+}
+catch (Exception e)
+{
+    Console.WriteLine(e.Message);
+}
+
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 

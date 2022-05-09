@@ -40,10 +40,13 @@ namespace Blog.Data.Repository
             
             
 
-            var query = _ctx.Articles.AsNoTracking().AsQueryable();
+            var query = _ctx.Articles
+                .OrderBy(a => a.Created)
+                .AsNoTracking()
+                .AsQueryable();
 
             if (!String.IsNullOrEmpty(category))
-                query = query.Where(a => ContainCatagory(a.Categories, category));
+                query = query.Where(a => a.Categories.ToLower().Contains(category.ToLower() + ','));
                                                         
 
             if (!String.IsNullOrEmpty(search))
@@ -115,7 +118,7 @@ namespace Blog.Data.Repository
         private int GetCategoryCount(string category)
         {
             return _ctx.Articles
-                        .Where(a => ContainCatagory(a.Categories, category))
+                        .Where(a => a.Categories.ToLower().Contains(category.ToLower()+','))
                         .ToList()
                         .Count();
         }
@@ -180,11 +183,7 @@ namespace Blog.Data.Repository
                 });
         }
 
-        private bool ContainCatagory(string catagories, string catagory)
-        {
-            return catagories.ToLower().Split(',').Contains(catagory.ToLower());
-        }
-
+       
         private List<int> GetPageNumbers(int pageNumber, int pageCount)
         {
             var pageNumbers = new List<int>();
