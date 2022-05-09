@@ -275,7 +275,6 @@ namespace Blog.Data.Repository
         private List<string> GetGenres()
         {
             return _ctx.Articles
-                .OrderBy(a => a.GenreName)
                 .Select(a => a.GenreName)
                 .Distinct()
                 .ToList();

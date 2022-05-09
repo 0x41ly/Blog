@@ -4,9 +4,14 @@ using Blog.Areas.Identity.Data;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Blog.Data.Repository;
 using Blog.Data.FileManager;
+using Blog.Data;
 
 var builder = WebApplication.CreateBuilder(args);
+
+
 var connectionString = builder.Configuration.GetConnectionString("BlogDbContextConnection");
+
+
 
 builder.Services.AddDbContext<BlogDbContext>(options =>
     options.UseSqlServer(connectionString));
@@ -65,7 +70,7 @@ var scope = app.Services.CreateScope();
 try
 {
     var ctx = scope.ServiceProvider.GetRequiredService<BlogDbContext>();
-    var userMgr = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+    var userMgr = scope.ServiceProvider.GetRequiredService<UserManager<BlogUser>>();
     var roleMgr = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
     ctx.Database.EnsureCreated();
 
@@ -78,12 +83,27 @@ try
     if (!ctx.Users.Any(u => u.UserName == "admin"))
     {
         //create an admin
-        var adminUser = new IdentityUser
+        var adminUser = new BlogUser
         {
             UserName = "admin",
-            Email = "admin@blog.com"
+            Email = "admin@blog.com",
+            FirstName = "SIKI",
+            LastName = "MIKI",
+            Gender = "Male",
+            PlanType = "Basic",
+            DOB = new DateTime(2000, 1, 1)
         };
-        var result = userMgr.CreateAsync(adminUser, "SiKiMiKi").GetAwaiter().GetResult();
+        var result = userMgr.CreateAsync(adminUser, "6#B9[*g,f=x[V+7t").GetAwaiter().GetResult();
+        var code = await userMgr.GenerateEmailConfirmationTokenAsync(adminUser);
+        var ConfirmationResult = await userMgr.ConfirmEmailAsync(adminUser, code);
+        if (ConfirmationResult.Succeeded)
+        {
+            Console.WriteLine("Successfully Done");
+        }
+        else
+        {
+            Console.WriteLine("Something Went Wrong");
+        }
         //add role to user
         userMgr.AddToRoleAsync(adminUser, adminRole.Name).GetAwaiter().GetResult();
     }
