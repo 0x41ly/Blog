@@ -5,6 +5,7 @@ using Blog.Data.FileManager;
 using Blog.Data.Repository;
 using Microsoft.AspNetCore.Identity;
 using Blog.Areas.Identity.Data;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Blog.Controllers;
 
@@ -33,6 +34,17 @@ public class HomeController : Controller
     {
 
         var vm = _repo.GetIndexViewModel(pageNumber, category, search, _userManager.GetUserId(User));
+        return View(vm);
+    }
+   [Authorize]
+    public IActionResult Article(Guid? id)
+    {
+        if (id == null)
+        {
+            return NotFound();
+        }
+        Guid Id = id.Value;
+        var vm = _repo.GetArticleViewModel(Id);
         return View(vm);
     }
 
