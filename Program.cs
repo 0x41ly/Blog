@@ -4,13 +4,14 @@ using Blog.Areas.Identity.Data;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Blog.Data.Repository;
 using Blog.Data.FileManager;
-using Blog.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
 
-var connectionString = builder.Configuration.GetConnectionString("BlogDbContextConnection");
 
+
+var connectionString = builder.Configuration.GetConnectionString("BlogDbContextConnection");
+var config = builder.Configuration;
 
 
 builder.Services.AddDbContext<BlogDbContext>(options =>
@@ -55,7 +56,61 @@ builder.Services.Configure<PasswordHasherOptions>(option =>
 {
     option.IterationCount = 12000;
 });
-
+builder.Services.AddAuthentication()
+   .AddCookie()
+   /*.AddOpenIdConnect(options =>
+   {
+       options.SignInScheme = "Cookies";
+       options.Authority = "-your-identity-provider-";
+       options.RequireHttpsMetadata = true;
+       options.ClientId = "-your-clientid-";
+       options.ClientSecret = "-your-client-secret-from-user-secrets-or-keyvault";
+       options.ResponseType = "code";
+       options.UsePkce = true;
+       options.Scope.Add("profile");
+       options.SaveTokens = true;
+       options.GetClaimsFromUserInfoEndpoint = true;
+       options.ClaimActions.MapUniqueJsonKey("preferred_username",
+                                             "preferred_username");
+       options.ClaimActions.MapUniqueJsonKey("gender", "gender");
+       options.TokenValidationParameters = new TokenValidationParameters
+       {
+           NameClaimType = "email"
+           //, RoleClaimType = "role"
+       };
+   })*/
+   .AddFacebook(options =>
+   {
+       
+       options.AppId = config["Authentication__Facebook__AppId"];
+       options.AppSecret = config["Authentication__Facebook__AppSecret"];
+       options.AccessDeniedPath = "/AccessDeniedPathInfo";
+   });
+/*builder.Services.AddAuthentication()
+   .AddGoogle(options =>
+   {
+       IConfigurationSection googleAuthNSection =
+       config.GetSection("Authentication:Google");
+       options.ClientId = googleAuthNSection["ClientId"];
+       options.ClientSecret = googleAuthNSection["ClientSecret"];
+   })
+   .AddFacebook(options =>
+   {
+       IConfigurationSection FBAuthNSection = config.GetSection("Authentication:FB");
+       options.ClientId = FBAuthNSection["ClientId"];
+       options.ClientSecret = FBAuthNSection["ClientSecret"];
+   })
+   .AddMicrosoftAccount(microsoftOptions =>
+   {
+       microsoftOptions.ClientId = config["Authentication:Microsoft:ClientId"];
+       microsoftOptions.ClientSecret = config["Authentication:Microsoft:ClientSecret"];
+   })
+   .AddTwitter(twitterOptions =>
+   {
+       twitterOptions.ConsumerKey = config["Authentication:Twitter:ConsumerAPIKey"];
+       twitterOptions.ConsumerSecret = config["Authentication:Twitter:ConsumerSecret"];
+       twitterOptions.RetrieveUserDetails = true;
+   });*/
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

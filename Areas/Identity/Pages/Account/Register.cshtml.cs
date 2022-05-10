@@ -130,18 +130,18 @@ namespace Blog.Areas.Identity.Pages.Account
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
             {
-                var user = new BlogUser {
-                    UserName = Input.UserName,
-                    Email = Input.Email,
-                    DOB = Input.DOB,
-                    FirstName = Input.FirstName,
-                    LastName = Input.LastName,
-                    AvatarPath = "wwwroot/Images/Avatars/Default.png",
-                    Gender = Input.Gender,
-                    PlanType = "Basic"
-                };
+                var user = CreateUser();
 
-               
+                await _userStore.SetUserNameAsync(user, Input.UserName, CancellationToken.None);
+                await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
+                user.DOB = Input.DOB;
+                user.FirstName = Input.FirstName;
+                user.LastName = Input.LastName;
+                user.AvatarPath = "wwwroot/Images/Avatars/Default.png";
+                user.Gender = Input.Gender;
+                user.PlanType = "Basic";
+
+
                 var result = await _userManager.CreateAsync(user, Input.Password);
 
                 if (result.Succeeded)

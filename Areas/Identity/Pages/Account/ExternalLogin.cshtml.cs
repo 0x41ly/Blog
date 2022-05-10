@@ -78,8 +78,25 @@ namespace Blog.Areas.Identity.Pages.Account
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
             [Required]
+            [Display(Name = "First Name")]
+            public string FirstName { get; set; }
+            [Required]
+            [Display(Name = "Last Name")]
+            public string LastName { get; set; }
+            [Required]
             [EmailAddress]
+            [Display(Name = "Email")]
             public string Email { get; set; }
+            [Required]
+            [Display(Name = "User Name")]
+            public string UserName { get; set; }
+            [Required]
+            [Display(Name = "Gender")]
+            public string Gender { get; set; }
+            [Required]
+            [DataType(DataType.Date)]
+            [Display(Name = "Date of Birth")]
+            public DateTime DOB { get; set; }
         }
         
         public IActionResult OnGet() => RedirectToPage("./Login");
@@ -149,8 +166,14 @@ namespace Blog.Areas.Identity.Pages.Account
             {
                 var user = CreateUser();
 
-                await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
+                await _userStore.SetUserNameAsync(user, Input.UserName, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
+                user.DOB = Input.DOB;
+                user.FirstName = Input.FirstName;
+                user.LastName = Input.LastName;
+                user.AvatarPath = "wwwroot/Images/Avatars/Default.png";
+                user.Gender = Input.Gender;
+                user.PlanType = "Basic";
 
                 var result = await _userManager.CreateAsync(user);
                 if (result.Succeeded)
