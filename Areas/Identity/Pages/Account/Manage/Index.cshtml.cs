@@ -7,6 +7,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using Blog.Areas.Identity.Data;
+using Blog.Data.FileManager;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -17,6 +18,7 @@ namespace Blog.Areas.Identity.Pages.Account.Manage
     {
         private readonly UserManager<BlogUser> _userManager;
         private readonly SignInManager<BlogUser> _signInManager;
+        private readonly IFileManager _fileManager;
 
         public IndexModel(
             UserManager<BlogUser> userManager,
@@ -52,25 +54,46 @@ namespace Blog.Areas.Identity.Pages.Account.Manage
         /// </summary>
         public class InputModel
         {
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
+            [Display(Name = "First Name")]
+            public string FirstName { get; set; }
+            [Display(Name = "Last Name")]
+            public string LastName { get; set; }
+            [Display(Name = "Date of birth")]
+            [DataType(DataType.Date)]
+            [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
+            public DateTime DOB { get; set; }
+            [Display(Name = "Username")]
+            public string Username { get; set; }
             [Phone]
             [Display(Name = "Phone number")]
             public string PhoneNumber { get; set; }
+            [Display(Name = "Profile Picture")]
+            public byte[] ProfilePicture { get; set; }
+
+
+
         }
 
         private async Task LoadAsync(BlogUser user)
         {
             var userName = await _userManager.GetUserNameAsync(user);
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
-
+            var firstName = user.FirstName;
+            var lastName = user.LastName;
+            var dob = user.DOB;
+            FileStream? profilePicture = null ; /*_fileManager.ImageStream("Avatars", user.AvatarPath);*/
+            MemoryStream ms = new MemoryStream();
+            profilePicture.CopyTo(ms);
             Username = userName;
-
             Input = new InputModel
             {
-                PhoneNumber = phoneNumber
+                PhoneNumber = phoneNumber,
+                Username = userName,
+                FirstName = firstName,
+                LastName = lastName,
+                ProfilePicture = ms.ToArray(),
+                DOB = dob
+              
             };
         }
 
@@ -110,8 +133,32 @@ namespace Blog.Areas.Identity.Pages.Account.Manage
                     return RedirectToPage();
                 }
             }
-
-            await _signInManager.RefreshSignInAsync(user);
+            var firstName = user.FirstName;
+            var lastName = user.LastName;
+            var dob = user.DOB;
+            if (Input.FirstName != firstName)
+            {
+                user.FirstName = Input.FirstName;
+                await _userManager.UpdateAsync(user);
+            }
+            if (Input.LastName != lastName)
+            {
+                user.LastName = Input.LastName;
+                await _userManager.UpdateAsync(user);
+            }
+            if (Input.DOB != dob)
+            {
+                user.DOB = Input.DOB;
+                await _userManager.UpdateAsync(user);
+            }
+            if (Request.Form.Files.Count > 0)
+            {
+                IFormFile file = Request.Form.Files.FirstOrDefault();
+                var AvatarPath = await _fileManager.SaveImage("Avatars", file);
+                user.AvatarPath = AvatarPath;
+                await _userManager.UpdateAsync(user);
+            }
+                await _signInManager.RefreshSignInAsync(user);
             StatusMessage = "Your profile has been updated";
             return RedirectToPage();
         }

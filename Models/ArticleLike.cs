@@ -4,10 +4,13 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Blog.Models
 {
-    [Keyless]
+    
     public class ArticleLike
     {
-        
+        [Key]
+        [Column(Order = 0)]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public Guid Id { get; set; }
         [MaxLength(450)]
         public string UserId { get; set; }
         

@@ -138,7 +138,8 @@ try
             LastName = "MIKI",
             Gender = "Male",
             PlanType = "",
-            DOB = new DateTime(2000, 1, 1)
+            AvatarPath = "wwwroot/Images/Avatars/Default.png",
+        DOB = new DateTime(2000, 1, 1)
         };
         var result = userMgr.CreateAsync(adminUser, "6#B9[*g,f=x[V+7t").GetAwaiter().GetResult();
         var code = await userMgr.GenerateEmailConfirmationTokenAsync(adminUser);
@@ -165,6 +166,7 @@ try
             LastName = "MIKI",
             Gender = "Male",
             PlanType = "",
+            AvatarPath = "wwwroot/Images/Avatars/Default.png",
             DOB = new DateTime(2000, 1, 1)
         };
         var result = userMgr.CreateAsync(OwnerUser, "6#B9[*g,f=x[V+7t").GetAwaiter().GetResult();

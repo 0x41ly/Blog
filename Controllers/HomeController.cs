@@ -68,43 +68,47 @@ public class HomeController : Controller
     [Authorize]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> AddArticle([Bind("Title"
-                                                    , "GenreName"
-                                                    , "Categories"
-                                                    , "Level"
-                                                    , "Description"
-                                                    ,"Content")] Article article)
+    public async Task<IActionResult> AddArticle(string Title
+                                                ,string GenreName
+                                                ,string Categories
+                                                ,string Level
+                                                ,string Description
+                                                ,string Content)
     {
-        if (ModelState.IsValid)
+        Article article = new Article
         {
-            var user = await _userManager.GetUserAsync(User);
-            var UserId = await _userManager.GetUserIdAsync(user);
-            if (User.IsInRole("BlogOwner") | User.IsInRole("Admin"))
+            Title = Title,
+            GenreName = GenreName,
+            Categories = Categories,
+            Level = Level,
+            Description = Description,
+            Content = Content
+        };
+        var user = await _userManager.GetUserAsync(User);
+        var UserId = await _userManager.GetUserIdAsync(user);
+        if (User.IsInRole("BlogOwner") | User.IsInRole("Admin"))
+        {
+            await PostArticle(article, UserId);
+            return RedirectToAction("Article", new { id = article.ArticleId });
+        }
+        if (user.PlanType == "Premium")
+        {
+            if (_repo.IsAllowedToPost(UserId))
             {
                 await PostArticle(article, UserId);
                 return RedirectToAction("Article", new { id = article.ArticleId });
             }
-            if (user.PlanType == "Premium")
-            {
-                if (_repo.IsAllowedToPost(UserId))
-                {
-                    await PostArticle(article, UserId);
-                    return RedirectToAction("Article", new { id = article.ArticleId });
-                }
-                else
-                {
-                    TempData["Message"] = "warning: You have exceeded your monthly allowed articles";
-                    return RedirectToAction("Index");
-                }
-            }
             else
             {
-                TempData["Message"] = "warning: Only premiums who can post an article";
+                TempData["Message"] = "warning: You have exceeded your monthly allowed articles";
                 return RedirectToAction("Index");
             }
         }
-        TempData["Message"] = "danger: Something went wrong";
-        return View(article);
+        else
+        {
+            TempData["Message"] = "warning: Only premiums who can post an article";
+            return RedirectToAction("Index");
+        }
     }
 
     private async Task PostArticle(Article article, string UserId)
@@ -114,6 +118,9 @@ public class HomeController : Controller
         article.Description = System.Net.WebUtility.HtmlEncode(article.Description);
         article.GenreName = System.Net.WebUtility.HtmlEncode(article.GenreName);
         article.Created = DateTime.Now;
+        article.LastUpdated = DateTime.Now;
+        article.Pinned = false;
+        article.Recommended = false;
         article.Categories = System.Net.WebUtility.HtmlEncode(article.Categories);
         article.Content = System.Net.WebUtility.HtmlEncode(article.Content);
         article.Level = System.Net.WebUtility.HtmlEncode(article.Level);
@@ -129,36 +136,34 @@ public class HomeController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Comment([Bind("ArticleId,ParentId,Message")] Comment comment)
     {
-        if (ModelState.IsValid)
-        {
-            comment.Message = System.Net.WebUtility.HtmlEncode(comment.Message);
-            comment.CommentId = Guid.NewGuid();
-            comment.Created = DateTime.Now;
-            var user = await _userManager.GetUserAsync(User);
-            comment.AuthorId = await _userManager.GetUserIdAsync(user);
-            if (comment.ParentId == Guid.Empty)
-            {
-                comment.level = 0;
-            }
-            else
-            {
-                comment.level = _repo.GetCommentlevelByID(comment.ParentId) + 1 ;
-            }
-            if (_repo.AddComment(comment))
-            {
-                await _repo.SaveChangesAsync();
-            }
-            else
-            {
-                TempData["Message"] = "warning: You either trying to add a comment to a non existent article or a subcomment to non existanct comment";
-                return RedirectToAction("Index");
-            }
-            TempData["Message"] = "success: Successfully Added The comment";
-            return RedirectToAction("Article", new { id = comment.ArticleId });
-        }
 
-        TempData["Message"] = "danger: Something went wrong";
+        comment.Message = System.Net.WebUtility.HtmlEncode(comment.Message);
+        comment.CommentId = Guid.NewGuid();
+        comment.Created = DateTime.Now;
+        var user = await _userManager.GetUserAsync(User);
+        comment.AuthorId = await _userManager.GetUserIdAsync(user);
+        if (comment.ParentId == Guid.Empty)
+        {
+            comment.level = 0;
+        }
+        else
+        {
+            comment.level = _repo.GetCommentlevelByID(comment.ParentId) + 1 ;
+        }
+        if (_repo.AddComment(comment))
+        {
+            await _repo.SaveChangesAsync();
+        }
+        else
+        {
+            TempData["Message"] = "warning: You either trying to add a comment to a non existent article or a subcomment to non existanct comment";
+            return RedirectToAction("Index");
+        }
+        TempData["Message"] = "success: Successfully Added The comment";
         return RedirectToAction("Article", new { id = comment.ArticleId });
+        
+
+        
     }
 
     [Authorize]
@@ -240,8 +245,7 @@ public class HomeController : Controller
         {
             return NotFound();
         }
-        if (ModelState.IsValid)
-        {
+
             var user = await _userManager.GetUserAsync(User);
             var UserId = await _userManager.GetUserIdAsync(user);
             var Article = _repo.GetArticle(article.ArticleId);
@@ -272,12 +276,7 @@ public class HomeController : Controller
                 return NotFound();
             }
 
-        }
-        else
-        {
-            TempData["Message"] = "danger: Something went wrong";
-            return View(article);
-        }
+        
     }
     [Authorize]
     [HttpPost]

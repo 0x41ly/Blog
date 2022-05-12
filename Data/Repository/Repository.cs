@@ -11,7 +11,6 @@ namespace Blog.Data.Repository
     public class Repository : IRepository
     {
         private BlogDbContext _ctx;
-        private readonly IMapper _mapper;
         private readonly UserManager<BlogUser> _userManager;
 
         public Repository(BlogDbContext ctx,
@@ -19,7 +18,7 @@ namespace Blog.Data.Repository
             UserManager<BlogUser> userManager)
         {
             _ctx = ctx;
-            _mapper = mapper;
+
             _userManager = userManager;
         }
         
@@ -333,9 +332,20 @@ namespace Blog.Data.Repository
         }
         private UserProfile GetUserProfile(string id)
         {
-            return _mapper.Map<UserProfile>(_ctx.Users
+            var user = _ctx.Users
                     .Where(u => u.Id == id)
-                    .FirstOrDefault());
+                    .FirstOrDefault();
+            UserProfile userProfile = new UserProfile
+            {
+                AvatarPath = user.AvatarPath,
+                PlanType = user.PlanType,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Email = user.Email,
+                Gender = user.Gender,
+                DOB = user.DOB
+            };
+            return userProfile;
         }
         private List<FrontArticleView> GetSideBarArticles(string genreName)
         {
@@ -353,10 +363,12 @@ namespace Blog.Data.Repository
         {
             if (GetArticle(ArticleId) != null)
             {
+                var view = _ctx.Views.Where(e => e.ArticleId == ArticleId & e.UserId == UserId)
+                    .FirstOrDefault();
 
-                if (!_ctx.Views.Any(e => e.ArticleId == ArticleId & e.UserId == UserId))
+                if (view == null)
                 {
-                    _ctx.Views.Add(new View { ArticleId = ArticleId, UserId = UserId });
+                    _ctx.Views.Add(new View {Id = Guid.NewGuid() , ArticleId = ArticleId, UserId = UserId });
                 }
                 return true;
             }
@@ -366,10 +378,18 @@ namespace Blog.Data.Repository
         public bool AddArticleLike(Guid ArticleId, string UserId)
         {
             if (GetArticle(ArticleId) != null)
-            {     
-                var ArticleLike = new ArticleLike { ArticleId = ArticleId, UserId = UserId };
-                if (!_ctx.ArticleLikes.Any(e => e.ArticleId == ArticleId & e.UserId == UserId))
+            {
+                var ArticleLike = _ctx.ArticleLikes
+                    .Where(e => e.ArticleId == ArticleId & e.UserId == UserId)
+                    .FirstOrDefault();
+                if (ArticleLike == null)
                 {
+                    ArticleLike = new ArticleLike
+                    {
+                        Id = Guid.NewGuid(),
+                        ArticleId = ArticleId,
+                        UserId = UserId
+                    };
                     _ctx.ArticleLikes.Add(ArticleLike);
                 }
                 else
@@ -386,9 +406,15 @@ namespace Blog.Data.Repository
 
             if (GetComment(CommentId) != null)
             {
-                var CommentLike = new CommentLike { CommentId = CommentId, UserId = UserId };
-                if (_ctx.CommentLikes.Any(e => e.CommentId == CommentId & e.UserId == UserId))
+                var CommentLike = _ctx.CommentLikes
+                    .Where(e => e.CommentId == CommentId & e.UserId == UserId)
+                    .FirstOrDefault();
+                if (CommentLike == null)
                 {
+                     CommentLike = new CommentLike {
+                        Id= Guid.NewGuid(),
+                        CommentId = CommentId,
+                        UserId = UserId };
                     _ctx.CommentLikes.Add(CommentLike);
                 }
                 else

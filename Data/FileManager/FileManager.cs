@@ -46,14 +46,15 @@ namespace Blog.Data.FileManager
                 //var fileName = image.FileName;
                 var mime = image.FileName.Substring(image.FileName.LastIndexOf('.'));
                 var fileName = $"img_{DateTime.Now.ToString("dd-MM-yyyy-HH-mm-ss")}{mime}";
+                var filePath = Path.Combine(save_path, fileName);
 
-                using (var fileStream = new FileStream(Path.Combine(save_path, fileName), FileMode.Create))
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
                 {
                     MagicImageProcessor.ProcessImage(image.OpenReadStream(), fileStream, ImageOptions());
                 }
 
 
-                return fileName;
+                return filePath;
             }
             catch (Exception e)
             {
