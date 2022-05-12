@@ -54,7 +54,17 @@ public class HomeController : Controller
         }
         return View(vm);
     }
-
+    public async Task<IActionResult> AddArticle()
+    {
+        var user = await _userManager.GetUserAsync(User);
+        var UserId = await _userManager.GetUserIdAsync(user);
+        if (User.IsInRole("BlogOwner") | User.IsInRole("Admin") | user.PlanType == "Premium")
+        {
+            return View();
+        }
+        TempData["Message"] = "warning: Only premiums who can post an article";
+        return RedirectToAction("Index");
+    }
     [Authorize]
     [HttpPost]
     [ValidateAntiForgeryToken]
@@ -94,7 +104,7 @@ public class HomeController : Controller
             }
         }
         TempData["Message"] = "danger: Something went wrong";
-        return RedirectToAction("Index");
+        return View(article);
     }
 
     private async Task PostArticle(Article article, string UserId)
@@ -134,15 +144,203 @@ public class HomeController : Controller
             {
                 comment.level = _repo.GetCommentlevelByID(comment.ParentId) + 1 ;
             }
-            _repo.AddComment(comment);
-            await _repo.SaveChangesAsync();
-
+            if (_repo.AddComment(comment))
+            {
+                await _repo.SaveChangesAsync();
+            }
+            else
+            {
+                TempData["Message"] = "warning: You either trying to add a comment to a non existent article or a subcomment to non existanct comment";
+                return RedirectToAction("Index");
+            }
             TempData["Message"] = "success: Successfully Added The comment";
             return RedirectToAction("Article", new { id = comment.ArticleId });
         }
 
         TempData["Message"] = "danger: Something went wrong";
         return RedirectToAction("Article", new { id = comment.ArticleId });
+    }
+
+    [Authorize]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<ActionResult> CommentLike(Guid CommentId)
+    {
+
+        var user = await _userManager.GetUserAsync(User);
+        var UserId = await _userManager.GetUserIdAsync(user);
+        
+        if (_repo.AddCommentLike(CommentId, UserId))
+        {
+            await _repo.SaveChangesAsync();
+            return RedirectToAction("Article", new { id = _repo.GetArticleId(CommentId) });
+        }
+        TempData["Message"] = "warning: The comment you are trying to like is not exist";
+        return RedirectToAction("Index");
+
+    }
+
+    [Authorize]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<ActionResult> ArticleLike(Guid ArticleId)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        var UserId = await _userManager.GetUserIdAsync(user);
+
+        if (_repo.AddArticleLike(ArticleId, UserId))
+        {
+            await _repo.SaveChangesAsync();
+            return RedirectToAction("Article", new { id = ArticleId });
+        }
+        TempData["Message"] = "warning: The article you are trying to like is not exist";
+        return RedirectToAction("Index");
+    }
+
+    [Authorize]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public ActionResult Genre(string GenreName)
+    {
+        if (GenreName != null)
+        {
+            var article = _repo.GetFirstArticleByGenre(GenreName);
+            if (article != null)
+            {
+
+                return RedirectToAction("Article", article);
+            }
+            return NotFound();
+        }
+        return NotFound();
+    }
+    
+
+    public IActionResult UpdateArticle(Guid id)
+    {
+        var article = _repo.GetArticle(id);
+        if (article != null)
+        {
+            return View(article);
+        }
+        return NotFound();
+    }
+    [Authorize]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> UpdateArticle(Guid id,[Bind("ArticleId"
+                                                    , "Title"
+                                                    , "GenreName"
+                                                    , "Categories"
+                                                    , "Level"
+                                                    , "Description"
+                                                    ,"Content")] Article article)
+    {
+        if (id != article.ArticleId)
+        {
+            return NotFound();
+        }
+        if (ModelState.IsValid)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            var UserId = await _userManager.GetUserIdAsync(user);
+            var Article = _repo.GetArticle(article.ArticleId);
+            if (Article != null)
+            {
+                if (Article.AuthorId == UserId | User.IsInRole("BlogOwner") | User.IsInRole("Admin"))
+                {
+                    Article.Title = System.Net.WebUtility.HtmlEncode(article.Title);
+                    Article.Description = System.Net.WebUtility.HtmlEncode(article.Description);
+                    Article.GenreName = System.Net.WebUtility.HtmlEncode(article.GenreName);
+                    Article.Categories = System.Net.WebUtility.HtmlEncode(article.Categories);
+                    Article.Content = System.Net.WebUtility.HtmlEncode(article.Content);
+                    Article.Level = System.Net.WebUtility.HtmlEncode(article.Level);
+                    _repo.UpdateArticle(Article);
+                    await _repo.SaveChangesAsync();
+                    TempData["Message"] = "success: Successfully updeated ";
+                    return RedirectToAction("Article", article);
+                }
+                else
+                {
+                    TempData["Message"] = "warning: You are not authorized to update this article ";
+                    return RedirectToAction("Article", article);
+                }
+           
+            }
+            else
+            {
+                return NotFound();
+            }
+
+        }
+        else
+        {
+            TempData["Message"] = "danger: Something went wrong";
+            return View(article);
+        }
+    }
+    [Authorize]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> RemoveArticle(Guid? id)
+    {
+        if (id == null)
+        {
+            return NotFound();
+        }
+        var user = await _userManager.GetUserAsync(User);
+        var UserId = await _userManager.GetUserIdAsync(user);
+        var article = _repo.GetArticle(id.Value);
+        if (article != null)
+        {
+            if (article.AuthorId == UserId | User.IsInRole("BlogOwner") | User.IsInRole("Admin"))
+            {
+                _repo.RemoveArticle(id.Value);
+                await _repo.SaveChangesAsync();
+                return RedirectToAction("Index");
+            }
+            else
+            {
+                TempData["Message"] = "warning: You are not authorized to remove this article ";
+                return RedirectToAction("Article", article);
+            }
+        }
+        else
+        {
+            return NotFound();
+        }
+    }
+
+    [Authorize]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> RemoveComment(Guid? id)
+    {
+        if (id == null)
+        {
+            return NotFound();
+        }
+        var user = await _userManager.GetUserAsync(User);
+        var UserId = await _userManager.GetUserIdAsync(user);
+        var comment = _repo.GetArticle(id.Value);
+        if (comment != null)
+        {
+            if (comment.AuthorId == UserId | User.IsInRole("BlogOwner") | User.IsInRole("Admin"))
+            {
+                _repo.RemoveArticle(id.Value);
+                await _repo.SaveChangesAsync();
+                return RedirectToAction("Article", _repo.GetArticle(comment.ArticleId));
+            }
+            else
+            {
+                TempData["Message"] = "warning: You are not authorized to remove this comment ";
+                return RedirectToAction("Article", _repo.GetArticle(comment.ArticleId));
+            }
+        }
+        else
+        {
+            return NotFound();
+        }
     }
     public IActionResult Privacy()
     {

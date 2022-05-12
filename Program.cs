@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Blog.Data.Repository;
 using Blog.Data.FileManager;
 using Serilog;
+using Microsoft.AspNetCore.Diagnostics;
+using static System.Net.Mime.MediaTypeNames;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -80,8 +82,32 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+    app.UseExceptionHandler(exceptionHandlerApp =>
+    {
+        exceptionHandlerApp.Run(async context =>
+        {
+            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+
+            // using static System.Net.Mime.MediaTypeNames;
+            context.Response.ContentType = Text.Plain;
+
+            await context.Response.WriteAsync("An exception was thrown.");
+
+            var exceptionHandlerPathFeature =
+                context.Features.Get<IExceptionHandlerPathFeature>();
+
+            if (exceptionHandlerPathFeature?.Error is FileNotFoundException)
+            {
+                await context.Response.WriteAsync(" The file was not found.");
+            }
+
+            if (exceptionHandlerPathFeature?.Path == "/")
+            {
+                await context.Response.WriteAsync(" Page: Home.");
+            }
+        });
+    });
+
     app.UseHsts();
 }
 
@@ -161,6 +187,7 @@ catch (Exception e)
 {
     Console.WriteLine(e.Message);
 }
+app.UseStatusCodePagesWithReExecute("/StatusCode/{0}");
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();

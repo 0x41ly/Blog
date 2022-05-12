@@ -229,12 +229,17 @@ namespace Blog.Data.Repository
 
         public void RemoveArticle(Guid id)
         {
-            _ctx.Articles.Remove(GetArticle(id));
+                _ctx.Articles.Remove(GetArticle(id));
         }
 
-        public void UpdateArticle(Article article)
+        public bool UpdateArticle(Article article)
         {
-            _ctx.Articles.Update(article);
+            if (GetArticle(article.ArticleId) != null)
+            {
+                _ctx.Articles.Update(article);
+                return true;
+            }
+            return false;
         }
 
         public async Task<bool> SaveChangesAsync()
@@ -246,10 +251,14 @@ namespace Blog.Data.Repository
             return false;
         }
 
-        public void AddComment(Comment comment)
+        public bool AddComment(Comment comment)
         {
-            _ctx.Comments.Add(comment);
-            
+            if (GetComment(comment.CommentId) != null)
+            {
+                _ctx.Comments.Add(comment);
+                return true;
+            }
+            return false;
         }
 
         public ArticleViewModel GetArticleViewModel(Guid id)
@@ -316,7 +325,7 @@ namespace Blog.Data.Repository
 
             return CommentsViewModdel;
         }
-        private Article GetArticle(Guid id)
+        public Article? GetArticle(Guid id)
         {
             return _ctx.Articles
                         .Where(a => a.ArticleId == id)
@@ -340,40 +349,61 @@ namespace Blog.Data.Repository
                     }).ToList();
         }
 
-        public void AddView(Guid ArticleId, string UserId)
+        public bool AddView(Guid ArticleId, string UserId)
         {
-            
-            if (!_ctx.Views.Any(e => e.ArticleId == ArticleId & e.UserId == UserId))
+            if (GetArticle(ArticleId) != null)
             {
-                _ctx.Views.Add(new View { ArticleId = ArticleId, UserId = UserId });
+
+                if (!_ctx.Views.Any(e => e.ArticleId == ArticleId & e.UserId == UserId))
+                {
+                    _ctx.Views.Add(new View { ArticleId = ArticleId, UserId = UserId });
+                }
+                return true;
             }
-            
+            return false;
         }
 
-        public void AddArticleLike(Guid ArticleId, string UserId)
+        public bool AddArticleLike(Guid ArticleId, string UserId)
         {
-            var ArticleLike = new ArticleLike { ArticleId = ArticleId, UserId = UserId };
-            if (!_ctx.ArticleLikes.Any(e => e.ArticleId == ArticleId & e.UserId == UserId))
-            {
-                _ctx.ArticleLikes.Add(ArticleLike);
+            if (GetArticle(ArticleId) != null)
+            {     
+                var ArticleLike = new ArticleLike { ArticleId = ArticleId, UserId = UserId };
+                if (!_ctx.ArticleLikes.Any(e => e.ArticleId == ArticleId & e.UserId == UserId))
+                {
+                    _ctx.ArticleLikes.Add(ArticleLike);
+                }
+                else
+                {
+                    _ctx.ArticleLikes.Remove(ArticleLike);
+                }
+                return true;
             }
-            else
-            {
-                _ctx.ArticleLikes.Remove(ArticleLike);
-            }
+            return false;
         }
 
-        public void AddCommentLike(Guid CommentId, string UserId)
+        public bool AddCommentLike(Guid CommentId, string UserId)
         {
-            var CommentLike = new CommentLike { CommentId = CommentId, UserId = UserId }; 
-            if (_ctx.CommentLikes.Any(e => e.CommentId == CommentId & e.UserId == UserId))
+
+            if (GetComment(CommentId) != null)
             {
-                _ctx.CommentLikes.Add(CommentLike);
+                var CommentLike = new CommentLike { CommentId = CommentId, UserId = UserId };
+                if (_ctx.CommentLikes.Any(e => e.CommentId == CommentId & e.UserId == UserId))
+                {
+                    _ctx.CommentLikes.Add(CommentLike);
+                }
+                else
+                {
+                    _ctx.CommentLikes.Remove(CommentLike);
+                }
+                return true;
             }
-            else
-            {
-                _ctx.CommentLikes.Remove(CommentLike);
-            }
+            return false;
+        }
+
+        public Comment? GetComment(Guid commentId)
+        {
+            return _ctx.Comments
+                .FirstOrDefault(e => e.CommentId == commentId);
         }
 
         public bool IsAllowedToPost(string UserId)
@@ -402,6 +432,16 @@ namespace Blog.Data.Repository
                 .Select(c => c.level)
                 .First();
             return level;
+        }
+
+        public Guid GetArticleId(Guid CommentId)
+        {
+            return GetComment(CommentId).ArticleId;
+        }
+
+        public void RemoveComment(Guid id)
+        {
+            _ctx.Comments.Remove(GetComment(id));
         }
     }
 }

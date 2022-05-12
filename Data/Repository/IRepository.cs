@@ -12,15 +12,19 @@ namespace Blog.Data.Repository
         ArticleViewModel GetArticleViewModel(Guid id);
         IndexViewModel GetIndexViewModel(int pageNumber, string category, string search, string UserId);
         void AddArticle(Article article);
-        void UpdateArticle(Article article);
+        bool UpdateArticle(Article article);
         void RemoveArticle(Guid id);
-        void AddComment(Comment comment);
-        void AddView(Guid ArticleId, string UserId);
-        void AddArticleLike(Guid ArticleId, string UserId);
-        void AddCommentLike(Guid CommentId, string UserId);
+        void RemoveComment(Guid id);
+        bool AddComment(Comment comment);
+        bool AddView(Guid ArticleId, string UserId);
+        bool AddArticleLike(Guid ArticleId, string UserId);
+        bool AddCommentLike(Guid CommentId, string UserId);
         bool IsAllowedToPost(string UserId);
         ArticleViewModel GetFirstArticleByGenre(string Genre);
+        Guid GetArticleId(Guid CommentId);
         Task<bool> SaveChangesAsync();
         int GetCommentlevelByID(Guid id);
+        Article? GetArticle(Guid id);
+        public Comment? GetComment(Guid commentId);
     }
 }
