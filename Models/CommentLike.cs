@@ -13,8 +13,7 @@ namespace Blog.Models
         public string UserId { get; set; }
         
         public Guid CommentId { get; set; }
-       /* [ForeignKey("UserId")]
-        public BlogUser User { get; set; }*/
+
         [ForeignKey("CommentId")]
         public Comment Comment { get; set; }
 

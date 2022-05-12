@@ -167,7 +167,7 @@ namespace Blog.Migrations
 
                     b.HasIndex("AuthorId");
 
-                    b.ToTable("Articles");
+                    b.ToTable("Articles", (string)null);
                 });
 
             modelBuilder.Entity("Blog.Models.ArticleLike", b =>
@@ -182,7 +182,7 @@ namespace Blog.Migrations
 
                     b.HasIndex("ArticleId");
 
-                    b.ToTable("ArticleLikes");
+                    b.ToTable("ArticleLikes", (string)null);
                 });
 
             modelBuilder.Entity("Blog.Models.Comment", b =>
@@ -224,7 +224,7 @@ namespace Blog.Migrations
 
                     b.HasIndex("ParentId");
 
-                    b.ToTable("Comments");
+                    b.ToTable("Comments", (string)null);
                 });
 
             modelBuilder.Entity("Blog.Models.CommentLike", b =>
@@ -239,7 +239,7 @@ namespace Blog.Migrations
 
                     b.HasIndex("CommentId");
 
-                    b.ToTable("CommentLikes");
+                    b.ToTable("CommentLikes", (string)null);
                 });
 
             modelBuilder.Entity("Blog.Models.PinnedArticles", b =>
@@ -254,7 +254,7 @@ namespace Blog.Migrations
 
                     b.HasIndex("ArticleId");
 
-                    b.ToTable("PinnedArticles");
+                    b.ToTable("PinnedArticles", (string)null);
                 });
 
             modelBuilder.Entity("Blog.Models.RecommendedBy", b =>
@@ -269,7 +269,7 @@ namespace Blog.Migrations
 
                     b.HasIndex("ArticleId");
 
-                    b.ToTable("RecommendedBy");
+                    b.ToTable("RecommendedBy", (string)null);
                 });
 
             modelBuilder.Entity("Blog.Models.View", b =>
@@ -284,7 +284,7 @@ namespace Blog.Migrations
 
                     b.HasIndex("ArticleId");
 
-                    b.ToTable("Views");
+                    b.ToTable("Views", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

@@ -12,5 +12,6 @@ namespace Blog.ViewModels
         public UserProfile Author { get; set; }
         public List<FrontArticleView> SideBarArticles { get; set; }
         public List<CommentViewModel>? MainComments { get; set; }
+        public bool NotFound { get; set; }
     }
 }

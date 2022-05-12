@@ -11,10 +11,7 @@ namespace Blog.Models
         [MaxLength(450)]
         public string UserId { get; set; }
 
-
         public Guid ArticleId { get; set; }
-        /* [ForeignKey("UserId")]
-         public BlogUser User { get; set; }*/
         [ForeignKey("ArticleId")]
         public Article Article { get; set; }
 

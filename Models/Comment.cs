@@ -36,8 +36,8 @@ namespace Blog.Models
         [ForeignKey("ArticleId")]
         public virtual Article Article { get; set; }
         [ForeignKey("ParentId")]
-        public virtual ICollection<Comment> SubComments { get; set; }
-        public virtual Comment? ParentComment { get; set; }
+        public virtual ICollection<Comment>? SubComments { get; set; }
+        
 
 
     }

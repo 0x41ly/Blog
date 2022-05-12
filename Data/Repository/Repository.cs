@@ -257,12 +257,18 @@ namespace Blog.Data.Repository
             var ArticleViewModel = new ArticleViewModel();
             ArticleViewModel.Genres = GetGenres();
             ArticleViewModel.Article = GetArticle(id);
-            ArticleViewModel.ArticleLikes = GetArticleLikes(id);
-            ArticleViewModel.ArticleViews = GetArticleViews(id);
-            ArticleViewModel.Author = GetUserProfile(ArticleViewModel.Article.AuthorId);
-            ArticleViewModel.SideBarArticles = GetSideBarArticles(ArticleViewModel.Article.GenreName);
-            ArticleViewModel.MainComments = GetComments(id, 0);                                        
-                                                   
+            if(ArticleViewModel.Article != null) 
+            { 
+                ArticleViewModel.ArticleLikes = GetArticleLikes(id);
+                ArticleViewModel.ArticleViews = GetArticleViews(id);
+                ArticleViewModel.Author = GetUserProfile(ArticleViewModel.Article.AuthorId);
+                ArticleViewModel.SideBarArticles = GetSideBarArticles(ArticleViewModel.Article.GenreName);
+                ArticleViewModel.MainComments = GetComments(id, 0);
+            }
+            else
+            {
+                ArticleViewModel.NotFound = true;
+            }
             return ArticleViewModel;
         }
 
@@ -294,7 +300,7 @@ namespace Blog.Data.Repository
         {
             var CommentsViewModdel = new List<CommentViewModel>();
             var comments = _ctx.Comments
-                .Where(c => c.CommentId == id & c.level == level).ToList();
+                .Where(c => c.ArticleId == id & c.level == level).ToList();
             foreach (var comment in comments)
             {
                 CommentViewModel commentViewModel = new CommentViewModel();
@@ -303,7 +309,7 @@ namespace Blog.Data.Repository
                 commentViewModel.CommentLikes = GetCommentLikes(comment.CommentId);
                 if (comment.level < 3)
                 {
-                    commentViewModel.SubComments = GetComments(id, comment.level);
+                    commentViewModel.SubComments = GetComments(id, comment.level +1 );
                 }
                 CommentsViewModdel.Add(commentViewModel);
             }
@@ -387,6 +393,15 @@ namespace Blog.Data.Repository
                 .OrderBy(a => a.Created)
                 .ToList()[0];
             return GetArticleViewModel(article.ArticleId);
+        }
+
+        public int GetCommentlevelByID(Guid id)
+        {
+            var level = _ctx.Comments
+                .Where(c => c.CommentId == id)
+                .Select(c => c.level)
+                .First();
+            return level;
         }
     }
 }

@@ -21,5 +21,6 @@ namespace Blog.Data.Repository
         bool IsAllowedToPost(string UserId);
         ArticleViewModel GetFirstArticleByGenre(string Genre);
         Task<bool> SaveChangesAsync();
+        int GetCommentlevelByID(Guid id);
     }
 }

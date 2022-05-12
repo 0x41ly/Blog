@@ -4,14 +4,25 @@ using Blog.Areas.Identity.Data;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Blog.Data.Repository;
 using Blog.Data.FileManager;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
 
 
-
-var connectionString = builder.Configuration.GetConnectionString("BlogDbContextConnection");
 var config = builder.Configuration;
+var connectionString = config.GetConnectionString("BlogDbContextConnection");
+
+
+
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .CreateBootstrapLogger();
+
+Log.Information("Starting up");
+builder.Host.UseSerilog((ctx, lc) => lc
+    .WriteTo.Console()
+    .ReadFrom.Configuration(ctx.Configuration));
 
 
 builder.Services.AddDbContext<BlogDbContext>(options =>
@@ -35,7 +46,7 @@ builder.Services.Configure<IdentityOptions>(options =>
     // Default User settings.
     options.User.AllowedUserNameCharacters =
             "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_";
-    options.User.RequireUniqueEmail = false;
+    options.User.RequireUniqueEmail = true;
 
 });
 
@@ -46,8 +57,6 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.Cookie.HttpOnly = true;
     options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
     options.LoginPath = "/Identity/Account/Login";
-    // ReturnUrlParameter requires 
-    //using Microsoft.AspNetCore.Authentication.Cookies;
     options.ReturnUrlParameter = CookieAuthenticationDefaults.ReturnUrlParameter;
     options.SlidingExpiration = true;
 });
@@ -58,59 +67,14 @@ builder.Services.Configure<PasswordHasherOptions>(option =>
 });
 builder.Services.AddAuthentication()
    .AddCookie()
-   /*.AddOpenIdConnect(options =>
-   {
-       options.SignInScheme = "Cookies";
-       options.Authority = "-your-identity-provider-";
-       options.RequireHttpsMetadata = true;
-       options.ClientId = "-your-clientid-";
-       options.ClientSecret = "-your-client-secret-from-user-secrets-or-keyvault";
-       options.ResponseType = "code";
-       options.UsePkce = true;
-       options.Scope.Add("profile");
-       options.SaveTokens = true;
-       options.GetClaimsFromUserInfoEndpoint = true;
-       options.ClaimActions.MapUniqueJsonKey("preferred_username",
-                                             "preferred_username");
-       options.ClaimActions.MapUniqueJsonKey("gender", "gender");
-       options.TokenValidationParameters = new TokenValidationParameters
-       {
-           NameClaimType = "email"
-           //, RoleClaimType = "role"
-       };
-   })*/
    .AddFacebook(options =>
    {
        
        options.AppId = config["Authentication__Facebook__AppId"];
        options.AppSecret = config["Authentication__Facebook__AppSecret"];
-       options.AccessDeniedPath = "/AccessDeniedPathInfo";
+       options.AccessDeniedPath = "/Identity/Account/AccessDenied";
    });
-/*builder.Services.AddAuthentication()
-   .AddGoogle(options =>
-   {
-       IConfigurationSection googleAuthNSection =
-       config.GetSection("Authentication:Google");
-       options.ClientId = googleAuthNSection["ClientId"];
-       options.ClientSecret = googleAuthNSection["ClientSecret"];
-   })
-   .AddFacebook(options =>
-   {
-       IConfigurationSection FBAuthNSection = config.GetSection("Authentication:FB");
-       options.ClientId = FBAuthNSection["ClientId"];
-       options.ClientSecret = FBAuthNSection["ClientSecret"];
-   })
-   .AddMicrosoftAccount(microsoftOptions =>
-   {
-       microsoftOptions.ClientId = config["Authentication:Microsoft:ClientId"];
-       microsoftOptions.ClientSecret = config["Authentication:Microsoft:ClientSecret"];
-   })
-   .AddTwitter(twitterOptions =>
-   {
-       twitterOptions.ConsumerKey = config["Authentication:Twitter:ConsumerAPIKey"];
-       twitterOptions.ConsumerSecret = config["Authentication:Twitter:ConsumerSecret"];
-       twitterOptions.RetrieveUserDetails = true;
-   });*/
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -130,10 +94,12 @@ try
     ctx.Database.EnsureCreated();
 
     var adminRole = new IdentityRole("Admin");
+    var blogOwnerRole = new IdentityRole("BlogOwner");
     if (!ctx.Roles.Any())
     {
-        //create a role
         roleMgr.CreateAsync(adminRole).GetAwaiter().GetResult();
+        roleMgr.CreateAsync(blogOwnerRole).GetAwaiter().GetResult();
+
     }
     if (!ctx.Users.Any(u => u.UserName == "admin"))
     {
@@ -145,7 +111,7 @@ try
             FirstName = "SIKI",
             LastName = "MIKI",
             Gender = "Male",
-            PlanType = "Basic",
+            PlanType = "",
             DOB = new DateTime(2000, 1, 1)
         };
         var result = userMgr.CreateAsync(adminUser, "6#B9[*g,f=x[V+7t").GetAwaiter().GetResult();
@@ -161,6 +127,33 @@ try
         }
         //add role to user
         userMgr.AddToRoleAsync(adminUser, adminRole.Name).GetAwaiter().GetResult();
+    }
+    if (!ctx.Users.Any(u => u.UserName == "Owner"))
+    {
+        //create an admin
+        var OwnerUser = new BlogUser
+        {
+            UserName = "Owner",
+            Email = "Owner@blog.com",
+            FirstName = "SIKI",
+            LastName = "MIKI",
+            Gender = "Male",
+            PlanType = "",
+            DOB = new DateTime(2000, 1, 1)
+        };
+        var result = userMgr.CreateAsync(OwnerUser, "6#B9[*g,f=x[V+7t").GetAwaiter().GetResult();
+        var code = await userMgr.GenerateEmailConfirmationTokenAsync(OwnerUser);
+        var ConfirmationResult = await userMgr.ConfirmEmailAsync(OwnerUser, code);
+        if (ConfirmationResult.Succeeded)
+        {
+            Console.WriteLine("Successfully Done");
+        }
+        else
+        {
+            Console.WriteLine("Something Went Wrong");
+        }
+        //add role to user
+        userMgr.AddToRoleAsync(OwnerUser, blogOwnerRole.Name).GetAwaiter().GetResult();
     }
 
 }
@@ -181,4 +174,18 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 app.MapRazorPages();
+app.UseSerilogRequestLogging(
+    options =>
+    {
+        options.MessageTemplate =
+            "{RemoteIpAddress} {RequestScheme} {RequestHost} {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms";
+        options.EnrichDiagnosticContext = (
+            diagnosticContext,
+            httpContext) =>
+        {
+            diagnosticContext.Set("RequestHost", httpContext.Request.Host.Value);
+            diagnosticContext.Set("RequestScheme", httpContext.Request.Scheme);
+            diagnosticContext.Set("RemoteIpAddress", httpContext.Connection.RemoteIpAddress);
+        };
+    });
 app.Run();

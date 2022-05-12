@@ -38,11 +38,9 @@ namespace Blog.Models
 
         public virtual BlogUser Author { get; set; }
         
-        public virtual List<Comment> MainComments { get; set; }
+        public virtual ICollection<Comment>? MainComments { get; set; }
         
-  /*      public virtual ICollection<ArticleLike> ArticleLikes { get; set; }
-        
-        public virtual ICollection<View> Views { get; set; }*/
+
 
     }
 }
