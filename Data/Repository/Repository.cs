@@ -87,7 +87,7 @@ namespace Blog.Data.Repository
                         CommentsCount = GetCommentsCount(x.ArticleId),
                         userProfile = GetUserProfile(x.AuthorId)
                     })
-                    .Skip(articlesCount)
+                    .Skip(skipAmount)
                     .Take(pageSize)
                     .ToList(),
                 PinnedArticles = GetPinnedArticles(UserId),
