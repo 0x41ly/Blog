@@ -82,7 +82,10 @@ namespace Blog.Data.Repository
                     {
                         Id = x.ArticleId,
                         Title = x.Title,
-                        Description = x.Description
+                        Description = x.Description,
+                        CreatedDate = x.Created,
+                        CommentsCount = GetCommentsCount(x.ArticleId),
+                        userProfile = GetUserProfile(x.AuthorId)
                     })
                     .Skip(articlesCount)
                     .Take(pageSize)
@@ -177,11 +180,18 @@ namespace Blog.Data.Repository
                 {
                     Id = x.ArticleId,
                     Title = x.Title,
-                    Description = x.Description
+                    Description = x.Description,
+                    CreatedDate = x.Created,
+                    CommentsCount = GetCommentsCount(x.ArticleId),
+                    userProfile = GetUserProfile(x.AuthorId)
                 });
         }
 
-       
+        private int GetCommentsCount(Guid articleId)
+        {
+            return _ctx.Comments.Where(a => a.ArticleId == articleId).Count();
+        }
+
         private List<int> GetPageNumbers(int pageNumber, int pageCount)
         {
             var pageNumbers = new List<int>();
