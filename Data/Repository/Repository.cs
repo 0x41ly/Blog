@@ -9,7 +9,7 @@ namespace Blog.Data.Repository
 {
     public class Repository : IRepository
     {
-        private BlogDbContext _ctx;
+        private static BlogDbContext _ctx;
         private readonly UserManager<BlogUser> _userManager;
 
         public Repository(BlogDbContext ctx,
@@ -187,9 +187,11 @@ namespace Blog.Data.Repository
                 });
         }
 
-        private int GetCommentsCount(Guid articleId)
+        private static int GetCommentsCount(Guid articleId)
         {
-            return _ctx.Comments.Where(a => a.ArticleId == articleId).Count();
+            
+            int count = _ctx.Comments.Where(a => a.ArticleId == articleId).Count();
+            return count;
         }
 
         private List<int> GetPageNumbers(int pageNumber, int pageCount)
@@ -339,7 +341,7 @@ namespace Blog.Data.Repository
                         .Where(a => a.ArticleId == id)
                         .FirstOrDefault();
         }
-        private UserProfile GetUserProfile(string id)
+        private static UserProfile GetUserProfile(string id)
         {
             var user = _ctx.Users
                     .Where(u => u.Id == id)
