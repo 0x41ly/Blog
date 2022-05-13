@@ -342,7 +342,56 @@ public class HomeController : Controller
             return NotFound();
         }
     }
-    public IActionResult Privacy()
+    [Authorize]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Recommend(Guid ArticleId)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        var UserId = await _userManager.GetUserIdAsync(user);
+
+        if (_repo.Recommend(ArticleId, UserId))
+        {
+            await _repo.SaveChangesAsync();
+            return RedirectToAction("Article", new { id = ArticleId });
+        }
+
+        TempData["Message"] = "warning: The article you are trying to like is not exist";
+        return RedirectToAction("Index");
+    }
+
+    [Authorize]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> RequstPremium()
+    {
+        var user = await _userManager.GetUserAsync(User);
+        var userRequestedPremium = user.RequestedPremium;
+        if (user.PlanType != "Premium")
+        {
+            if (!userRequestedPremium)
+            {
+                var UserId = await _userManager.GetUserIdAsync(user);
+                _repo.RequestPremium(UserId);
+                await _repo.SaveChangesAsync();
+                TempData["Message"] = "success: Your request will be processed as soon as possible";
+                return RedirectToAction("Index");
+            }
+            else
+            {
+                TempData["Message"] = "success: Your have sent a request before. Please be patient";
+                return RedirectToAction("Index");
+            }
+
+        }
+        else
+        {
+            TempData["Message"] = "warning: Your are already premium";
+            return RedirectToAction("Index");
+        }
+
+    }
+        public IActionResult Privacy()
     {
         return View();
     }

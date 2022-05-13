@@ -27,6 +27,8 @@ namespace Blog.Areas.Identity.Data
         public DateTime LastSeen { get; set; }
         public byte[]? ProfilePicture { get; set; }
 
+        public bool RequestedPremium { get; set; }
+
 
 
 

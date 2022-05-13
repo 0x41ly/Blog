@@ -3,7 +3,7 @@ public class UserProfile
 {
     public byte[]? ProfilePicture { get; set; }
 
-
+    public string  UserName { get; set; }
     public String PlanType { get; set; }
 
     public String FirstName { get; set; }

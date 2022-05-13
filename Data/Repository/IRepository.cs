@@ -25,6 +25,10 @@ namespace Blog.Data.Repository
         Task<bool> SaveChangesAsync();
         int GetCommentlevelByID(Guid id);
         Article? GetArticle(Guid id);
-        public Comment? GetComment(Guid commentId);
+        Comment? GetComment(Guid commentId);
+        bool Recommend(Guid ArticleId, string UserId);
+        AdminViewModel AdminViewModel(string UserId);
+        void RequestPremium(string UserId);
+        void GivePremium(string UserId);
     }
 }

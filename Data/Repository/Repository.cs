@@ -183,7 +183,8 @@ namespace Blog.Data.Repository
                     Description = x.Description,
                     CreatedDate = x.Created,
                     CommentsCount = GetCommentsCount(x.ArticleId),
-                    userProfile = GetUserProfile(x.AuthorId)
+                    userProfile = GetUserProfile(x.AuthorId),
+                    ViewsCount = GetArticleViews(x.ArticleId)
                 });
         }
 
@@ -348,7 +349,8 @@ namespace Blog.Data.Repository
                     .FirstOrDefault();
             UserProfile userProfile = new UserProfile
             {
-                ProfilePicture = null ,
+                ProfilePicture = user.ProfilePicture ,
+                UserName = user.UserName ,
                 PlanType = user.PlanType,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
@@ -484,6 +486,57 @@ namespace Blog.Data.Repository
         public void RemoveComment(Guid id)
         {
             _ctx.Comments.Remove(GetComment(id));
+        }
+
+        public bool Recommend(Guid ArticleId, string UserId)
+        {
+            var recommendedBy = _ctx.RecommendedBy
+                 .Where(e => e.ArticleId == ArticleId & e.UserId == UserId)
+                 .FirstOrDefault(); ;
+            if (recommendedBy == null)
+            {
+                recommendedBy = new RecommendedBy
+                {
+                    Id = Guid.NewGuid(),
+                    ArticleId = ArticleId,
+                    UserId = UserId
+
+                };
+                _ctx.RecommendedBy.Add(recommendedBy);
+                return true;
+            }
+            else
+            {
+                _ctx.RecommendedBy.Remove(recommendedBy);
+            }
+            return false;
+        }
+
+        public AdminViewModel AdminViewModel(string UserId)
+        {
+            
+            throw new NotImplementedException();
+        }
+
+        public void RequestPremium(string UserId)
+        {
+            var user = _ctx.Users
+                .Where(u => u.Id == UserId)
+                .FirstOrDefault();
+            user.RequestedPremium = true;
+            _ctx.Users.Update(user);
+                
+
+         
+        }
+
+        public void GivePremium(string UserId)
+        {
+            var user = _ctx.Users
+                .Where(u => u.Id == UserId)
+                .FirstOrDefault();
+            user.PlanType = "Premium";
+            _ctx.Users.Update(user);
         }
     }
 }
