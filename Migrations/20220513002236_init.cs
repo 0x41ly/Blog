@@ -28,13 +28,13 @@ namespace Blog.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    AvatarPath = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PlanType = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Gender = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DOB = table.Column<DateTime>(type: "datetime2", nullable: false),
                     LastSeen = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ProfilePicture = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -83,14 +83,15 @@ namespace Blog.Migrations
                     ArticleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Title = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     GenreName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    Catagories = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Categories = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Level = table.Column<string>(type: "nvarchar(15)", maxLength: 15, nullable: false),
                     Created = table.Column<DateTime>(type: "datetime2", nullable: false),
                     LastUpdated = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    AuthorId = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: false),
-                    Recommended = table.Column<bool>(type: "bit", nullable: false)
+                    Pinned = table.Column<bool>(type: "bit", nullable: false),
+                    Recommended = table.Column<bool>(type: "bit", nullable: false),
+                    AuthorId = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -192,11 +193,13 @@ namespace Blog.Migrations
                 name: "ArticleLikes",
                 columns: table => new
                 {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: false),
                     ArticleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
+                    table.PrimaryKey("PK_ArticleLikes", x => x.Id);
                     table.ForeignKey(
                         name: "FK_ArticleLikes_Articles_ArticleId",
                         column: x => x.ArticleId,
@@ -232,17 +235,63 @@ namespace Blog.Migrations
                         column: x => x.CreatorId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Comments_Comments_ParentId",
+                        column: x => x.ParentId,
+                        principalTable: "Comments",
+                        principalColumn: "CommentId"
+                        );
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PinnedArticles",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: false),
+                    ArticleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PinnedArticles", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PinnedArticles_Articles_ArticleId",
+                        column: x => x.ArticleId,
+                        principalTable: "Articles",
+                        principalColumn: "ArticleId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "RecommendedBy",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: false),
+                    ArticleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RecommendedBy", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_RecommendedBy_Articles_ArticleId",
+                        column: x => x.ArticleId,
+                        principalTable: "Articles",
+                        principalColumn: "ArticleId",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
                 name: "Views",
                 columns: table => new
                 {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: false),
                     ArticleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
+                    table.PrimaryKey("PK_Views", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Views_Articles_ArticleId",
                         column: x => x.ArticleId,
@@ -255,11 +304,13 @@ namespace Blog.Migrations
                 name: "CommentLikes",
                 columns: table => new
                 {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: false),
                     CommentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
+                    table.PrimaryKey("PK_CommentLikes", x => x.Id);
                     table.ForeignKey(
                         name: "FK_CommentLikes_Comments_CommentId",
                         column: x => x.CommentId,
@@ -333,6 +384,21 @@ namespace Blog.Migrations
                 column: "CreatorId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Comments_ParentId",
+                table: "Comments",
+                column: "ParentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PinnedArticles_ArticleId",
+                table: "PinnedArticles",
+                column: "ArticleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RecommendedBy_ArticleId",
+                table: "RecommendedBy",
+                column: "ArticleId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Views_ArticleId",
                 table: "Views",
                 column: "ArticleId");
@@ -360,6 +426,12 @@ namespace Blog.Migrations
 
             migrationBuilder.DropTable(
                 name: "CommentLikes");
+
+            migrationBuilder.DropTable(
+                name: "PinnedArticles");
+
+            migrationBuilder.DropTable(
+                name: "RecommendedBy");
 
             migrationBuilder.DropTable(
                 name: "Views");

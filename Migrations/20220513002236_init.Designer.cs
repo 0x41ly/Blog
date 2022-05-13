@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Blog.Migrations
 {
     [DbContext(typeof(BlogDbContext))]
-    [Migration("20220507174711_Recommended_pinned_tables")]
-    partial class Recommended_pinned_tables
+    [Migration("20220513002236_init")]
+    partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -31,9 +31,6 @@ namespace Blog.Migrations
 
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
-
-                    b.Property<string>("AvatarPath")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
@@ -91,6 +88,9 @@ namespace Blog.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<byte[]>("ProfilePicture")
+                        .HasColumnType("varbinary(max)");
+
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
@@ -126,7 +126,7 @@ namespace Blog.Migrations
                         .HasMaxLength(450)
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("Catagories")
+                    b.Property<string>("Categories")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -174,6 +174,11 @@ namespace Blog.Migrations
 
             modelBuilder.Entity("Blog.Models.ArticleLike", b =>
                 {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnOrder(0);
+
                     b.Property<Guid>("ArticleId")
                         .HasColumnType("uniqueidentifier");
 
@@ -181,6 +186,8 @@ namespace Blog.Migrations
                         .IsRequired()
                         .HasMaxLength(450)
                         .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("ArticleId");
 
@@ -231,6 +238,11 @@ namespace Blog.Migrations
 
             modelBuilder.Entity("Blog.Models.CommentLike", b =>
                 {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnOrder(0);
+
                     b.Property<Guid>("CommentId")
                         .HasColumnType("uniqueidentifier");
 
@@ -239,6 +251,8 @@ namespace Blog.Migrations
                         .HasMaxLength(450)
                         .HasColumnType("nvarchar(450)");
 
+                    b.HasKey("Id");
+
                     b.HasIndex("CommentId");
 
                     b.ToTable("CommentLikes");
@@ -246,6 +260,11 @@ namespace Blog.Migrations
 
             modelBuilder.Entity("Blog.Models.PinnedArticles", b =>
                 {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnOrder(0);
+
                     b.Property<Guid>("ArticleId")
                         .HasColumnType("uniqueidentifier");
 
@@ -253,14 +272,21 @@ namespace Blog.Migrations
                         .IsRequired()
                         .HasMaxLength(450)
                         .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("ArticleId");
 
                     b.ToTable("PinnedArticles");
                 });
 
-            modelBuilder.Entity("Blog.Models.RecommenedBy", b =>
+            modelBuilder.Entity("Blog.Models.RecommendedBy", b =>
                 {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnOrder(0);
+
                     b.Property<Guid>("ArticleId")
                         .HasColumnType("uniqueidentifier");
 
@@ -268,6 +294,8 @@ namespace Blog.Migrations
                         .IsRequired()
                         .HasMaxLength(450)
                         .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("ArticleId");
 
@@ -276,6 +304,11 @@ namespace Blog.Migrations
 
             modelBuilder.Entity("Blog.Models.View", b =>
                 {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnOrder(0);
+
                     b.Property<Guid>("ArticleId")
                         .HasColumnType("uniqueidentifier");
 
@@ -283,6 +316,8 @@ namespace Blog.Migrations
                         .IsRequired()
                         .HasMaxLength(450)
                         .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("ArticleId");
 
@@ -460,7 +495,7 @@ namespace Blog.Migrations
                         .WithMany()
                         .HasForeignKey("CreatorId");
 
-                    b.HasOne("Blog.Models.Comment", "ParentComment")
+                    b.HasOne("Blog.Models.Comment", null)
                         .WithMany("SubComments")
                         .HasForeignKey("ParentId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -469,8 +504,6 @@ namespace Blog.Migrations
                     b.Navigation("Article");
 
                     b.Navigation("Creator");
-
-                    b.Navigation("ParentComment");
                 });
 
             modelBuilder.Entity("Blog.Models.CommentLike", b =>
@@ -495,7 +528,7 @@ namespace Blog.Migrations
                     b.Navigation("Article");
                 });
 
-            modelBuilder.Entity("Blog.Models.RecommenedBy", b =>
+            modelBuilder.Entity("Blog.Models.RecommendedBy", b =>
                 {
                     b.HasOne("Blog.Models.Article", "Article")
                         .WithMany()

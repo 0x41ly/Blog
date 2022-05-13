@@ -137,7 +137,6 @@ namespace Blog.Areas.Identity.Pages.Account
                 user.DOB = Input.DOB;
                 user.FirstName = Input.FirstName;
                 user.LastName = Input.LastName;
-                user.AvatarPath = "wwwroot/Images/Avatars/Default.png";
                 user.Gender = Input.Gender;
                 user.PlanType = "Basic";
 

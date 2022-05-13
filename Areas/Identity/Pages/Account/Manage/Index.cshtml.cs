@@ -81,9 +81,7 @@ namespace Blog.Areas.Identity.Pages.Account.Manage
             var firstName = user.FirstName;
             var lastName = user.LastName;
             var dob = user.DOB;
-            FileStream? profilePicture = null ; /*_fileManager.ImageStream("Avatars", user.AvatarPath);*/
-            MemoryStream ms = new MemoryStream();
-            profilePicture.CopyTo(ms);
+            var profilePicture = user.ProfilePicture;
             Username = userName;
             Input = new InputModel
             {
@@ -91,7 +89,7 @@ namespace Blog.Areas.Identity.Pages.Account.Manage
                 Username = userName,
                 FirstName = firstName,
                 LastName = lastName,
-                ProfilePicture = ms.ToArray(),
+                ProfilePicture = profilePicture,
                 DOB = dob
               
             };
@@ -154,11 +152,14 @@ namespace Blog.Areas.Identity.Pages.Account.Manage
             if (Request.Form.Files.Count > 0)
             {
                 IFormFile file = Request.Form.Files.FirstOrDefault();
-                var AvatarPath = await _fileManager.SaveImage("Avatars", file);
-                user.AvatarPath = AvatarPath;
+                using (var dataStream = new MemoryStream())
+                {
+                    await file.CopyToAsync(dataStream);
+                    user.ProfilePicture = dataStream.ToArray();
+                }
                 await _userManager.UpdateAsync(user);
             }
-                await _signInManager.RefreshSignInAsync(user);
+            await _signInManager.RefreshSignInAsync(user);
             StatusMessage = "Your profile has been updated";
             return RedirectToPage();
         }

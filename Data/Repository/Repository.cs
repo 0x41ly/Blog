@@ -337,7 +337,7 @@ namespace Blog.Data.Repository
                     .FirstOrDefault();
             UserProfile userProfile = new UserProfile
             {
-                AvatarPath = user.AvatarPath,
+                ProfilePicture = null ,
                 PlanType = user.PlanType,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
@@ -369,8 +369,9 @@ namespace Blog.Data.Repository
                 if (view == null)
                 {
                     _ctx.Views.Add(new View {Id = Guid.NewGuid() , ArticleId = ArticleId, UserId = UserId });
+                    return true;
                 }
-                return true;
+                
             }
             return false;
         }
@@ -391,12 +392,14 @@ namespace Blog.Data.Repository
                         UserId = UserId
                     };
                     _ctx.ArticleLikes.Add(ArticleLike);
+                    return true;
                 }
                 else
                 {
                     _ctx.ArticleLikes.Remove(ArticleLike);
+                    return true;
                 }
-                return true;
+                
             }
             return false;
         }
@@ -416,12 +419,14 @@ namespace Blog.Data.Repository
                         CommentId = CommentId,
                         UserId = UserId };
                     _ctx.CommentLikes.Add(CommentLike);
+                    return true;
                 }
                 else
                 {
                     _ctx.CommentLikes.Remove(CommentLike);
+                    return true;
                 }
-                return true;
+                
             }
             return false;
         }

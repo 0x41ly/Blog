@@ -1,7 +1,7 @@
 namespace Blog.Models;
 public class UserProfile
 {
-    public String? AvatarPath { get; set; }
+    public byte[]? ProfilePicture { get; set; }
 
 
     public String PlanType { get; set; }
