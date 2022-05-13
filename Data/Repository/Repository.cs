@@ -2,7 +2,6 @@ using Blog.Areas.Identity.Data;
 using Blog.Models;
 using Blog.ViewModels;
 using Microsoft.EntityFrameworkCore;
-using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 
 
@@ -14,7 +13,7 @@ namespace Blog.Data.Repository
         private readonly UserManager<BlogUser> _userManager;
 
         public Repository(BlogDbContext ctx,
-            IMapper mapper,
+            
             UserManager<BlogUser> userManager)
         {
             _ctx = ctx;

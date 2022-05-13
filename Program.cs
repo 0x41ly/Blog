@@ -39,8 +39,7 @@ builder.Services.AddScoped<IFileManager, FileManager>();
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-// Add AutoMapper
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
 
 
 builder.Services.Configure<IdentityOptions>(options =>
