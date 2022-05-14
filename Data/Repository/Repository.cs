@@ -66,7 +66,7 @@ namespace Blog.Data.Repository
             int skipAmount = pageSize * (pageNumber - 1);
             
 
-            return new IndexViewModel
+            var indexViewModel = new IndexViewModel
             {
                 Genres = GetGenres(),
                 PageNumber = pageNumber,
@@ -77,7 +77,14 @@ namespace Blog.Data.Repository
                 Category = category,
                 Search = search,
                 RecommendedArticles = GetRecommenedArticles(),
-                Articles = (List<FrontArticleView>) query
+                
+                PinnedArticles = GetPinnedArticles(UserId),
+                CategoriesCount = GetCategoriesCount()
+
+            };
+            if (query.ToList().Count() > pageSize )
+            {
+                indexViewModel.Articles = (List<FrontArticleView>)query
                     .Select(x => new FrontArticleView
                     {
                         Id = x.ArticleId,
@@ -89,11 +96,24 @@ namespace Blog.Data.Repository
                     })
                     .Skip(skipAmount)
                     .Take(pageSize)
-                    .ToList(),
-                PinnedArticles = GetPinnedArticles(UserId),
-                CategoriesCount = GetCategoriesCount()
+                    .ToList();
+            }
+            else
+            {
+                indexViewModel.Articles = (List<FrontArticleView>)query
+                    .Select(x => new FrontArticleView
+                    {
+                        Id = x.ArticleId,
+                        Title = x.Title,
+                        Description = x.Description,
+                        CreatedDate = x.Created,
+                        CommentsCount = GetCommentsCount(x.ArticleId),
+                        userProfile = GetUserProfile(x.AuthorId)
+                    })
+                    .ToList();
 
-            };
+            }
+            return indexViewModel;
         }
 
         private List<CatagoryCountViewModel> GetCategoriesCount()
@@ -537,6 +557,60 @@ namespace Blog.Data.Repository
                 .FirstOrDefault();
             user.PlanType = "Premium";
             _ctx.Users.Update(user);
+        }
+
+        public bool RemoveUser(string UserId)
+        {
+            var user = _ctx.Users
+                .Where(u => u.Id == UserId)
+                .FirstOrDefault();
+            if (user != null)
+            {
+                _ctx.Users.Remove(user);
+                return true;
+            }
+            return false;
+        }
+
+        public bool LocalPin(string UserId, Guid ArticleId)
+        {
+
+            if (GetArticle(ArticleId) != null)
+            {
+                var ArticlePin = _ctx.PinnedArticles
+                    .Where(e => e.ArticleId == ArticleId & e.UserId == UserId)
+                    .FirstOrDefault();
+                if (ArticlePin == null)
+                {
+                    ArticlePin = new PinnedArticles
+                    {
+                        Id = Guid.NewGuid(),
+                        ArticleId = ArticleId,
+                        UserId = UserId
+                    };
+                    _ctx.PinnedArticles.Add(ArticlePin);
+                    return true;
+                }
+                else
+                {
+                    _ctx.PinnedArticles.Remove(ArticlePin);
+                    return true;
+                }
+
+            }
+            return false; 
+        }
+
+        public bool GlobalPin(string UserId, Guid ArticleId)
+        {
+            var article = GetArticle(ArticleId);
+            if (article != null)
+            {
+                article.Pinned = !article.Pinned;
+                _ctx.Articles.Update(article);
+                return true;
+            }
+            return false;
         }
     }
 }

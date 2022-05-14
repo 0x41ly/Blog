@@ -30,5 +30,10 @@ namespace Blog.Data.Repository
         AdminViewModel AdminViewModel(string UserId);
         void RequestPremium(string UserId);
         void GivePremium(string UserId);
+
+        bool RemoveUser(string UserId);
+        bool LocalPin(string UserId, Guid ArticleId);
+        bool GlobalPin(string UserId, Guid ArticleId);
+
     }
 }
