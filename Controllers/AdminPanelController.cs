@@ -33,7 +33,7 @@ public class AdminPanelController : Controller
         _fileManager = fileManager;
     }
 
-    public async Task<IActionResult> IndexAsync()
+    public async Task<IActionResult> Index()
     {
         var user = await _userManager.GetUserAsync(User);
         var UserId = await _userManager.GetUserIdAsync(user);
