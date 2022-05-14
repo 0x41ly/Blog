@@ -33,10 +33,11 @@ public class AdminPanelController : Controller
         _fileManager = fileManager;
     }
 
-    public IActionResult Index()
+    public async Task<IActionResult> IndexAsync()
     {
-
-        var vm = "";
+        var user = await _userManager.GetUserAsync(User);
+        var UserId = await _userManager.GetUserIdAsync(user);
+        var vm = _repo.AdminViewModel(UserId);
         return View(vm);
     }
 }

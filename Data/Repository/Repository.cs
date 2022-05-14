@@ -464,7 +464,7 @@ namespace Blog.Data.Repository
             return false;
         }
 
-        public Comment? GetComment(Guid commentId)
+        private Comment? GetComment(Guid commentId)
         {
             return _ctx.Comments
                 .FirstOrDefault(e => e.CommentId == commentId);
