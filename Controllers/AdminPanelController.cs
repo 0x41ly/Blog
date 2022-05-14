@@ -10,6 +10,8 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Blog.Controllers;
 
+
+[Authorize(Roles = "Admin")]
 public class AdminPanelController : Controller
 {
     private readonly ILogger<HomeController> _logger;

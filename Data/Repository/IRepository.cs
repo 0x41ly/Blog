@@ -20,7 +20,7 @@ namespace Blog.Data.Repository
         bool AddArticleLike(Guid ArticleId, string UserId);
         bool AddCommentLike(Guid CommentId, string UserId);
         bool IsAllowedToPost(string UserId);
-        ArticleViewModel GetFirstArticleByGenre(string Genre);
+        Guid? GetFirstArticleIdByGenre(string Genre);
         Guid GetArticleId(Guid CommentId);
         Task<bool> SaveChangesAsync();
         int GetCommentlevelByID(Guid id);

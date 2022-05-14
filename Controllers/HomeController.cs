@@ -210,11 +210,11 @@ public class HomeController : Controller
     {
         if (GenreName != null)
         {
-            var article = _repo.GetFirstArticleByGenre(GenreName);
-            if (article != null)
+            var id = _repo.GetFirstArticleIdByGenre(GenreName);
+            if (id != null)
             {
 
-                return RedirectToAction("Article", article);
+                return RedirectToAction("Article", id);
             }
             return NotFound();
         }
@@ -263,12 +263,12 @@ public class HomeController : Controller
                     _repo.UpdateArticle(Article);
                     await _repo.SaveChangesAsync();
                     TempData["Message"] = "success: Successfully updeated ";
-                    return RedirectToAction("Article", article);
+                    return RedirectToAction("Article", article.ArticleId);
                 }
                 else
                 {
                     TempData["Message"] = "warning: You are not authorized to update this article ";
-                    return RedirectToAction("Article", article);
+                    return RedirectToAction("Article", article.ArticleId);
                 }
            
             }
@@ -302,7 +302,7 @@ public class HomeController : Controller
             else
             {
                 TempData["Message"] = "warning: You are not authorized to remove this article ";
-                return RedirectToAction("Article", article);
+                return RedirectToAction("Article", article.ArticleId);
             }
         }
         else
@@ -329,12 +329,12 @@ public class HomeController : Controller
             {
                 _repo.RemoveArticle(id.Value);
                 await _repo.SaveChangesAsync();
-                return RedirectToAction("Article", _repo.GetArticle(comment.ArticleId));
+                return RedirectToAction("Article", comment.ArticleId);
             }
             else
             {
                 TempData["Message"] = "warning: You are not authorized to remove this comment ";
-                return RedirectToAction("Article", _repo.GetArticle(comment.ArticleId));
+                return RedirectToAction("Article", comment.ArticleId);
             }
         }
         else

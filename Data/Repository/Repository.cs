@@ -480,13 +480,13 @@ namespace Blog.Data.Repository
             
         }
 
-        public ArticleViewModel GetFirstArticleByGenre(string Genre)
+        public Guid? GetFirstArticleIdByGenre(string Genre)
         {
             var article = _ctx.Articles
                 .Where(a => a.GenreName == Genre)
                 .OrderBy(a => a.Created)
                 .ToList()[0];
-            return GetArticleViewModel(article.ArticleId);
+            return article.ArticleId;
         }
 
         public int GetCommentlevelByID(Guid id)
