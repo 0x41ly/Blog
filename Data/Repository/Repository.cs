@@ -534,8 +534,8 @@ namespace Blog.Data.Repository
 
         public AdminViewModel AdminViewModel(string UserId)
         {
-            
-            throw new NotImplementedException();
+
+            return new AdminViewModel();
         }
 
         public void RequestPremium(string UserId)
