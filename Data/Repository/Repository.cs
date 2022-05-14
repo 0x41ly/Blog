@@ -220,7 +220,7 @@ namespace Blog.Data.Repository
             var pageNumbers = new List<int>();
             if (pageCount < 10)
             {
-                for (int i = 0; i < pageCount; i++)
+                for (int i = 1; i <= pageCount; i++)
                 {
                     pageNumbers.Add(i);
                 }
