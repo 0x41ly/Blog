@@ -9,7 +9,7 @@ namespace Blog.Data.Repository
     {
 
         
-        ArticleViewModel GetArticleViewModel(Guid id);
+        ArticleViewModel GetArticleViewModel(Guid id, string UserId);
         IndexViewModel GetIndexViewModel(int pageNumber, string category, string search, string UserId);
         void AddArticle(Article article);
         bool UpdateArticle(Article article);

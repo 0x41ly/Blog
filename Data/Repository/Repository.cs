@@ -293,7 +293,7 @@ namespace Blog.Data.Repository
             return false;
         }
 
-        public ArticleViewModel GetArticleViewModel(Guid id)
+        public ArticleViewModel GetArticleViewModel(Guid id, string UserId)
         {
             var ArticleViewModel = new ArticleViewModel();
             ArticleViewModel.Genres = GetGenres();
@@ -305,6 +305,8 @@ namespace Blog.Data.Repository
                 ArticleViewModel.Author = GetUserProfile(ArticleViewModel.Article.AuthorId);
                 ArticleViewModel.SideBarArticles = GetSideBarArticles(ArticleViewModel.Article.GenreName);
                 ArticleViewModel.MainComments = GetComments(id, 0);
+                ArticleViewModel.isPinned = GetPinnedArticles(UserId).Any(a => a.Id == id);
+                ArticleViewModel.isLiked = _ctx.ArticleLikes.Any(a => a.Id == id & a.UserId ==UserId);
             }
             else
             {

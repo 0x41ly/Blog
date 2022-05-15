@@ -48,7 +48,7 @@ public class HomeController : Controller
         var UserId = await _userManager.GetUserIdAsync(user);
         _repo.AddView(Id, UserId);
         await _repo.SaveChangesAsync();
-        var vm = _repo.GetArticleViewModel(Id);
+        var vm = _repo.GetArticleViewModel(Id,UserId);
         if (vm.NotFound)
         {
             return NotFound();
