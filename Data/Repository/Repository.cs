@@ -192,7 +192,7 @@ namespace Blog.Data.Repository
             return RecommendedArticles;
         }
 
-        private FrontArticleView GetFrontArticleViewById(Guid articleId)
+        private static FrontArticleView GetFrontArticleViewById(Guid articleId)
         {
             return (FrontArticleView)_ctx.Articles
                 .Where(a => a.ArticleId == articleId)
@@ -206,7 +206,7 @@ namespace Blog.Data.Repository
                     userProfile = GetUserProfile(x.AuthorId),
                     ViewsCount = GetArticleViews(x.ArticleId),
                     LikeCount = GetArticleLikes(x.ArticleId)
-                });
+                }).FirstOrDefault();
         }
 
         private static int GetCommentsCount(Guid articleId)
@@ -313,7 +313,7 @@ namespace Blog.Data.Repository
             return ArticleViewModel;
         }
 
-        private int GetArticleViews(Guid id)
+        private static int GetArticleViews(Guid id)
         {
             return _ctx.Views
                     .Where(a => a.ArticleId == id).ToList().Count();
@@ -327,7 +327,7 @@ namespace Blog.Data.Repository
                 .ToList();
         }
 
-        private int GetArticleLikes(Guid id)
+        private static int GetArticleLikes(Guid id)
         {
             return _ctx.ArticleLikes
                     .Where(a => a.ArticleId == id).Count();
