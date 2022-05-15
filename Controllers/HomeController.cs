@@ -189,6 +189,26 @@ public class HomeController : Controller
     [Authorize]
     [HttpPost]
     [ValidateAntiForgeryToken]
+    public async Task<ActionResult> ArticlePin(Guid ArticleId)
+    {
+
+        var user = await _userManager.GetUserAsync(User);
+        var UserId = await _userManager.GetUserIdAsync(user);
+
+        if (_repo.LocalPin(UserId, ArticleId))
+        {
+            await _repo.SaveChangesAsync();
+            TempData["Message"] = "success: Successfully pinned";
+            return RedirectToAction("Article", new { id = ArticleId });
+        }
+        TempData["Message"] = "warning: The Article you are trying to pin is not exist";
+        return RedirectToAction("Index");
+
+    }
+
+    [Authorize]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<ActionResult> ArticleLike(Guid ArticleId)
     {
         var user = await _userManager.GetUserAsync(User);
@@ -222,12 +242,19 @@ public class HomeController : Controller
     }
     
 
-    public IActionResult UpdateArticle(Guid id)
+    public async Task<IActionResult> UpdateArticleAsync(Guid id)
     {
         var article = _repo.GetArticle(id);
-        if (article != null)
+        if (article != null )
         {
-            return View(article);
+            var user = await _userManager.GetUserAsync(User);
+            var UserId = await _userManager.GetUserIdAsync(user);
+            if (article.AuthorId == UserId & User.IsInRole("BlogOwner") | User.IsInRole("Admin"))
+            {
+                return View(article);
+            }
+            TempData["Message"] = "warning: You are not authorized to Update this article";
+            return RedirectToAction("Article", new { id = id });
         }
         return NotFound();
     }

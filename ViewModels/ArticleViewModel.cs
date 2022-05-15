@@ -1,4 +1,4 @@
-﻿using Blog.Areas.Identity.Data;
+﻿
 using Blog.Models;
 
 namespace Blog.ViewModels
