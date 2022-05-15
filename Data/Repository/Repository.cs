@@ -162,7 +162,7 @@ namespace Blog.Data.Repository
                                             .Where(x => x.UserId == UserId)
                                             .Select(i => new PinnedArticles {
                                                 ArticleId = i.ArticleId   
-                                            });
+                                            }).ToList();
                 foreach (var UserPinnedArticle in UserPinnedArticlesId)
                 {
                     UserPinnedArticles.Add(GetFrontArticleViewById(UserPinnedArticle.ArticleId));
@@ -204,7 +204,8 @@ namespace Blog.Data.Repository
                     CreatedDate = x.Created,
                     CommentsCount = GetCommentsCount(x.ArticleId),
                     userProfile = GetUserProfile(x.AuthorId),
-                    ViewsCount = GetArticleViews(x.ArticleId)
+                    ViewsCount = GetArticleViews(x.ArticleId),
+                    LikeCount = GetArticleLikes(x.ArticleId)
                 });
         }
 
@@ -329,12 +330,12 @@ namespace Blog.Data.Repository
         private int GetArticleLikes(Guid id)
         {
             return _ctx.ArticleLikes
-                    .Where(a => a.ArticleId == id).ToList().Count();
+                    .Where(a => a.ArticleId == id).Count();
         }
         private int GetCommentLikes(Guid id)
         {
             return _ctx.CommentLikes
-                    .Where(a => a.CommentId == id).ToList().Count();
+                    .Where(a => a.CommentId == id).Count();
         }
         private List<CommentViewModel>? GetComments(Guid id, int level)
         {
@@ -474,7 +475,6 @@ namespace Blog.Data.Repository
         {
             var MonthlyPostedArticles = _ctx.Articles
                                             .Where(a => a.AuthorId == UserId & a.Created.ToString("MM/yyyy") == DateTime.Now.ToString("MM/yyyy"))
-                                            .ToList()
                                             .Count();
             return MonthlyPostedArticles < 2;
             
@@ -572,7 +572,7 @@ namespace Blog.Data.Repository
             return false;
         }
 
-        public bool LocalPin(string UserId, Guid ArticleId)
+        public string LocalPin(string UserId, Guid ArticleId)
         {
 
             if (GetArticle(ArticleId) != null)
@@ -589,28 +589,65 @@ namespace Blog.Data.Repository
                         UserId = UserId
                     };
                     _ctx.PinnedArticles.Add(ArticlePin);
-                    return true;
+                    return "Added";
                 }
                 else
                 {
                     _ctx.PinnedArticles.Remove(ArticlePin);
-                    return true;
+                    return "Removed";
                 }
 
             }
-            return false; 
+            return "Error"; 
         }
 
-        public bool GlobalPin(string UserId, Guid ArticleId)
+        public string GlobalPin(string UserId, Guid ArticleId)
         {
             var article = GetArticle(ArticleId);
             if (article != null)
             {
                 article.Pinned = !article.Pinned;
                 _ctx.Articles.Update(article);
-                return true;
+                return article.Pinned ? "Adderd" :"Removed";
             }
-            return false;
+            return "Error";
         }
+
+        private int GetUsersCount()
+        {
+            return _ctx.Users.Count();
+        }
+
+        private int GetArticleCount()
+        {
+            return _ctx.ArticleLikes.Count();
+        }
+
+        private MostInteractionsArticleViewModel GetMostLikedArticles()
+        {
+            var ArticlesId = _ctx.Articles
+                .Select(a => a.ArticleId).ToList();
+            var Articles = new List<FrontArticleView>();
+            foreach (var ArticleId in ArticlesId)
+            {
+                Articles.Add(GetFrontArticleViewById(ArticleId));
+            }
+            var MostInteractions = new MostInteractionsArticleViewModel
+            {
+                MostLikedArticles = Articles
+                .OrderByDescending(a => a.LikeCount)
+                .Take(3),
+                MostCommentedArticles = Articles
+                .OrderByDescending(a => a.CommentsCount)
+                .Take(3),
+                MostViewedArticles = Articles
+                .OrderByDescending(a => a.ViewsCount)
+                .Take(3)
+            };
+
+            return MostInteractions;
+
+        }
+
     }
 }

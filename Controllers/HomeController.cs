@@ -195,10 +195,16 @@ public class HomeController : Controller
         var user = await _userManager.GetUserAsync(User);
         var UserId = await _userManager.GetUserIdAsync(user);
 
-        if (_repo.LocalPin(UserId, ArticleId))
+        if (_repo.LocalPin(UserId, ArticleId) == "Added")
         {
             await _repo.SaveChangesAsync();
             TempData["Message"] = "success: Successfully pinned";
+            return RedirectToAction("Article", new { id = ArticleId });
+        }
+        else if(_repo.LocalPin(UserId, ArticleId) == "Removed")
+        {
+            await _repo.SaveChangesAsync();
+            TempData["Message"] = "success: Successfully unpinned";
             return RedirectToAction("Article", new { id = ArticleId });
         }
         TempData["Message"] = "warning: The Article you are trying to pin is not exist";

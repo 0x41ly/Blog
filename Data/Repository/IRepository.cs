@@ -32,8 +32,8 @@ namespace Blog.Data.Repository
         void GivePremium(string UserId);
 
         bool RemoveUser(string UserId);
-        bool LocalPin(string UserId, Guid ArticleId);
-        bool GlobalPin(string UserId, Guid ArticleId);
+        string LocalPin(string UserId, Guid ArticleId);
+        string GlobalPin(string UserId, Guid ArticleId);
 
     }
 }

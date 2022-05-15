@@ -10,6 +10,7 @@ namespace Blog.ViewModels
         public DateTime CreatedDate { get; set; }
         public int CommentsCount { get; set; }
         public UserProfile userProfile { get; set; }
+        public int LikeCount { get; set; }
         public int ViewsCount { get; set; }
     }
 }
