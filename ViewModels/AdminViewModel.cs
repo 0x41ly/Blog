@@ -9,8 +9,7 @@ namespace Blog.ViewModels
 
         public UserProfile userProfile { get; set; }
 
-        public List<FrontArticleView>? MostViewedArticles { get; set; }
-        public List<FrontArticleView>? MostLikedArticles { get; set; }
+        public MostInteractionsArticleViewModel MostInteractionsArticleViewModel { get; set; }
         public List<UserProfile>? UserRequestedPremium { get; set; }
 
     }

@@ -537,7 +537,33 @@ namespace Blog.Data.Repository
         public AdminViewModel AdminViewModel(string UserId)
         {
 
-            return new AdminViewModel();
+            var AdminViewModel =  new AdminViewModel {
+                UsersCount = GetUsersCount(),
+                ArticleCount = GetArticleCount(),
+                MostInteractionsArticleViewModel = GetMostLikedArticles(),
+                userProfile = GetUserProfile(UserId),
+                UserRequestedPremium = GetUserRequestedPremium()
+            };
+            return AdminViewModel;
+        }
+
+        private List<UserProfile> GetUserRequestedPremium()
+        {
+            return (List<UserProfile>)_ctx.Users
+                .Where(a => a.RequestedPremium)
+                .Select(user => new UserProfile
+                {
+                    ProfilePicture = user.ProfilePicture,
+                    UserName = user.UserName,
+                    PlanType = user.PlanType,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    Email = user.Email,
+                    Gender = user.Gender,
+                    DOB = user.DOB
+                });
+
+            
         }
 
         public void RequestPremium(string UserId)
