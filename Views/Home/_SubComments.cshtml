@@ -1,0 +1,41 @@
+﻿@using Blog.ViewModels
+@model CommentViewModel
+
+
+@{
+
+    foreach (var commentview in Model.SubComments)
+    {
+        <div class="child-comment">
+            <div class="profile-column">
+                <i class="fas fa-user"></i>
+                <div class="line">
+                <!-- This is the line -->
+                </div>
+            </div>
+            <div class="parent-comment-contents">
+
+                <div class="user-info">
+                    <p class="">@Html.DisplayFor(modelItem => commentview.Creator.UserName)</p>
+                    <p>&#8226;</p>
+                    <p>@Html.DisplayFor(modelItem => commentview.Comment.Created)</p>
+                </div>
+                <div>
+                    <p id='slackbot-comment'>@Html.DisplayFor(modelItem => commentview.Comment.Message)</p>
+                </div>
+                <div class="rounded-circle">
+                    @if (commentview.Creator.ProfilePicture != null)
+                        {
+                            <img id="profilePicture" src="data:image/*;base64,@(Convert.ToBase64String(commentview.Creator.ProfilePicture))">
+                        }
+                        else
+                        {
+                            <img id="profilePicture"  src="~/Images/Avatars/Default.png">
+                       }
+                </div> 
+            </div>
+        </div>
+
+    }
+}
+  <link rel="stylesheet" href="~/Blog.styles.css" asp-append-version="true" />

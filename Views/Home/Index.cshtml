@@ -1,13 +1,298 @@
 ﻿@using Blog.ViewModels
+@using Blog.Areas.Identity.Data
 @model IndexViewModel
-
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<BlogUser> SignInManager
+@inject UserManager<BlogUser> UserManager
 @{
     ViewData["Title"] = "Home Page";
+    var user = await UserManager.GetUserAsync(User);
 }
-@{
+ @{
     Html.RenderPartial("../Shared/_StatusMessage", (string)(TempData["Message"])); 
-}
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+   }
+  @*<!-- ======= Header ======= -->
+  <header id="header" class="fixed-top d-flex align-items-center header-inner-pages">
+    <div class="container d-flex align-items-center justify-content-between">
+      
+          <form id="Genre-form" asp-controller="Home" asp-action="Genre" method="post">
+               <nav id="navbar" class="navbar">
+               <ul>
+                    @foreach (var genre in Model.Genres)
+                        {
+                                  
+                            <input type="hidden" name="GenreName" value="@genre" />
+                            <li><a class="nav-link scrollto " onclick="document.getElementById('Genre-form').submit();">@genre</a></li>
+                     
+               
+                         }
+                </ul>
+                 </nav>
+            </form>  
+       
+    </div>
+  </header><!-- End Header -->
+*@
+<partial name="_Genres"  model="Model.Genres"/>
+  <main id="main">
+
+    <!-- ======= Breadcrumbs ======= -->
+    <section id="breadcrumbs" class="breadcrumbs">
+       
+    <div class="row">
+        @if (SignInManager.IsSignedIn(User))
+            {
+                    @if (user != null & user.PlanType=="Basic")
+                    {
+                  <div class="col-sm-6">
+                    <div class="card"style="background=#ecf6fe;"> 
+                      <div class="card-body">
+                        <h5 class="card-title">Basic plan</h5>
+                        <p class="card-text">• You can leave comments on the posts posted by the influencer</p>
+                      </div>
+                    </div>
+                  </div>
+                  }
+                @if (user.PlanType == "Premium")
+                {
+                    <div class="col-sm-6">
+                        <div class="card"style="background=#ecf6fe;">
+                      <div class="card-body">
+                        <h5 class="card-title">Premium plan</h5>
+                        <p class="card-text">• post twice a month on the influencer's platform.</p>
+                        <p class="card-text">•send an email to the influencer for private discussion.</p>
+                    
+                      </div>
+                    </div>
+               
+                  </div>
+              }      }
+           </div>
+        @if (SignInManager.IsSignedIn(User))
+        {
+            @if (User.IsInRole("BlogOwner") | User.IsInRole("Admin") | user.PlanType == "Premium")
+            {
+                <a class="btn btn-outline-primary" asp-controller="Home" asp-action="AddArticle" role="button">Create Post</a>
+            }
+
+        }
+
+    </section><!-- End Breadcrumbs -->
+
+    <!-- ======= Blog Section ======= -->
+   
+    <section id="blog" class="blog">
+      <div class="container" data-aos="fade-up">
+            <div class="row">
+
+                  <div class="col-lg-8 entries">
+                     @foreach (var Article in Model.Articles)
+                     {
+                        <article class="entry">
+                          <h2 class="entry-title">
+                            <a asp-controller="Home" asp-action="Article"  asp-route-id="@Article.Id">@Article.Title</a>
+                          </h2>
+
+                          <div class="entry-meta">
+                                <ul>
+                                  <li class="d-flex align-items-center"><i class="bi bi-person"></i> <a method="get" asp-action="Index">@Article.userProfile.UserName</a></li>
+                                  <li class="d-flex align-items-center"><i class="bi bi-clock"></i> <a><time >@Article.CreatedDate</time></a></li>
+                                  <li class="d-flex align-items-center"><i class="bi bi-chat-dots"></i> <a >@Article.CommentsCount</a></li>
+                                </ul>
+                          </div>
+
+                          <div class="entry-content">
+                                <p>
+                                  @Article.Description
+                                </p>
+                                <div class="read-more">
+                                  <a asp-controller="Home" asp-action="Article"  asp-route-id="@Article.Id">Read More</a>
+                                </div>
+                          </div>
+
+                        </article><!-- End blog entry -->
+                    }
+           
+                    <div class="blog-pagination">
+                      <ul class="justify-content-center">
+                            @foreach (int num in Model.Pages)
+                          {
+                            <li><a class="@(num == Model.PageNumber ? "active" :"")"  asp-action="Index" asp-controller="Home" asp-route-category="@Model.Category"
+                              asp-route-search="@Model.Search" asp-route-pageNumber="@num">@num</a></li> 
+                          }
+                  
+                      </ul>
+                    </div>
+
+                  </div><!-- End blog entries list -->
+
+                  <div class="col-lg-4">
+
+                    <div class="sidebar">
+
+                      <h3 class="sidebar-title">Search</h3>
+              
+                        <div class="sidebar-item search-form">
+                             <form asp-controller="Home" asp-action="Index" method="get">
+                                <input type="hidden" name="pageNumber" value="@Model.PageNumber" />
+                                <input type="hidden" name="category" value="@Model.Category" />
+                                <input class="search" type="text" name="search" placeholder="Search Blog" value="@Model.Search" />
+                                <button type="submit"><i class="bi bi-search"></i></button>
+                            </form>
+                      </div><!-- End sidebar search formn-->
+                      <h3 class="sidebar-title">Pin Posts</h3>
+                      <div class="sidebar-item recent-posts">
+                       @foreach (var pin in Model.PinnedArticles)
+                        {
+                           <div class="post-item clearfix">
+                              <h4><a href="blog-single.html">@pin.Title</a></h4>
+                              <time>@pin.CreatedDate</time>
+                          </div>
+                        }
+
+                
+                      </div><!-- End sidebar Pin posts-->
+
+                      <h3 class="sidebar-title">Categories</h3>
+                      <div class="sidebar-item tags">
+                        <ul>
+                            @foreach (var category in Model.CategoriesCount)
+                            {
+                                  <li><a href="#">@category.Category (@category.Count)</a></li>
+                            }
+
+                
+                        </ul>
+                      </div><!-- End sidebar Categories-->
+
+                    </div><!-- End sidebar -->
+
+                  </div><!-- End blog sidebar -->
+            </div>
+      </div>
+    </section><!-- End Blog Section -->
+    
+  </main><!-- End #main -->
+
+  @*@*<!-- ======= Footer ======= -->
+  <footer id="footer">
+
+    <div class="footer-newsletter">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-6">
+            <h4>Our Newsletter</h4>
+            <p>Tamen quem nulla quae legam multos aute sint culpa legam noster magna</p>
+          </div>
+          <div class="col-lg-6">
+            <form action="" method="post">
+              <input type="email" name="email"><input type="submit" value="Subscribe">
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-top">
+      <div class="container">
+        <div class="row">
+
+          <div class="col-lg-3 col-md-6 footer-links">
+            <h4>Useful Links</h4>
+            <ul>
+              <li><i class="bx bx-chevron-right"></i> <a href="#">Home</a></li>
+              <li><i class="bx bx-chevron-right"></i> <a href="#">About us</a></li>
+              <li><i class="bx bx-chevron-right"></i> <a href="#">Services</a></li>
+              <li><i class="bx bx-chevron-right"></i> <a href="#">Terms of service</a></li>
+              <li><i class="bx bx-chevron-right"></i> <a href="#">Privacy policy</a></li>
+            </ul>
+          </div>
+
+          <div class="col-lg-3 col-md-6 footer-links">
+            <h4>Our Services</h4>
+            <ul>
+              <li><i class="bx bx-chevron-right"></i> <a href="#">Web Design</a></li>
+              <li><i class="bx bx-chevron-right"></i> <a href="#">Web Development</a></li>
+              <li><i class="bx bx-chevron-right"></i> <a href="#">Product Management</a></li>
+              <li><i class="bx bx-chevron-right"></i> <a href="#">Marketing</a></li>
+              <li><i class="bx bx-chevron-right"></i> <a href="#">Graphic Design</a></li>
+            </ul>
+          </div>
+
+          <div class="col-lg-3 col-md-6 footer-contact">
+            <h4>Contact Us</h4>
+            <p>
+              A108 Adam Street <br>
+              New York, NY 535022<br>
+              United States <br><br>
+              <strong>Phone:</strong> +1 5589 55488 55<br>
+              <strong>Email:</strong> info@example.com<br>
+            </p>
+
+          </div>
+
+          <div class="col-lg-3 col-md-6 footer-info">
+            <h3>About Anyar</h3>
+            <p>Cras fermentum odio eu feugiat lide par naso tierra. Justo eget nada terra videa magna derita valies darta donna mare fermentum iaculis eu non diam phasellus.</p>
+            <div class="social-links mt-3">
+              <a href="#" class="twitter"><i class="bx bxl-twitter"></i></a>
+              <a href="#" class="facebook"><i class="bx bxl-facebook"></i></a>
+              <a href="#" class="instagram"><i class="bx bxl-instagram"></i></a>
+              <a href="#" class="google-plus"><i class="bx bxl-skype"></i></a>
+              <a href="#" class="linkedin"><i class="bx bxl-linkedin"></i></a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="copyright">
+        &copy; Copyright <strong><span>Anyar</span></strong>. All Rights Reserved
+      </div>
+      <div class="credits">
+        <!-- All the links in the footer should remain intact. -->
+        <!-- You can delete the links only if you purchased the pro version. -->
+        <!-- Licensing information: https://bootstrapmade.com/license/ -->
+        <!-- Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/anyar-free-multipurpose-one-page-bootstrap-theme/ -->
+        Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
+      </div>
+    </div>
+     @{
+            await Html.RenderPartialAsync("_Article",new Article {});
+     }
+  </footer><!-- End Footer -->*@
+ 
+  <div id="preloader"></div>
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a
+
+  <!-- Favicons -->
+  <link href="~/HomeStyle/assets/img/favicon.png" rel="icon">
+  <link href="~/HomeStyle/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="~/HomeStyle/assets/vendor/animate.css/animate.min.css" rel="stylesheet" asp-append-version="true">
+  <link href="~/HomeStyle/assets/vendor/aos/aos.css" rel="stylesheet"asp-append-version="true">
+  <link href="~/HomeStyle/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet"asp-append-version="true">
+  <link href="~/HomeStyle/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet"asp-append-version="true">
+  <link href="~/HomeStyle/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet"asp-append-version="true">
+  <link href="~/HomeStyle/assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet"asp-append-version="true">
+  <link href="~/HomeStyle/assets/vendor/remixicon/remixicon.css" rel="stylesheet"asp-append-version="true">
+  <link href="~/HomeStyle/assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet"asp-append-version="true">
+
+  <!-- Template Main CSS File -->
+  <link href="~/HomeStyle/assets/css/style.css" rel="stylesheet"asp-append-version="true">
+  <!-- Vendor JS Files -->
+  <script src="~/HomeStyle/assets/vendor/aos/aos.js"asp-append-version="true"></script>
+  <script src="~/HomeStyle/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"asp-append-version="true"></script>
+  <script src="~/HomeStyle/assets/vendor/glightbox/js/glightbox.min.js"asp-append-version="true"></script>
+  <script src="~/HomeStyle/assets/vendor/isotope-layout/isotope.pkgd.min.js"asp-append-version="true"></script>
+  <script src="~/HomeStyle/assets/vendor/swiper/swiper-bundle.min.js"asp-append-version="true"></script>
+  <script src="~/HomeStyle/assets/vendor/php-email-form/validate.js"asp-append-version="true"></script>
+
+  <!-- Template Main JS File -->
+  <script src="~/HomeStyle/assets/js/main.js"asp-append-version="true"></script>

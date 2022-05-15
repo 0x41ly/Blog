@@ -1,0 +1,41 @@
+﻿@model Blog.Models.Article
+@{
+    ViewData["Title"] = "Update Post";
+}
+@{
+    Html.RenderPartial("../Shared/_StatusMessage", (string)(TempData["Message"])); 
+}
+
+
+
+
+ <!-- Modal -->
+<div class="modal fade" id="DeleteModal" tabindex="-1" aria-labelledby="DeleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+        <h5 class="modal-title" id="DeleteModalLabel">Attention..</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <p>Are you sure??</p>
+            <p>You are about to delete this Article!!!!</p>
+
+        </div>
+        <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <form method="post" asp-action="Delete" asp-controller="Topics">
+            <input type="hidden" asp-for="ArticleId" value="@Model.ArticleId"/>
+            <input type="submit" value="Delete" class="btn btn-primary btn-danger" /> 
+        </form>
+        
+        </div>
+    </div>
+    </div>
+</div>
+
+
+
+
+
+
