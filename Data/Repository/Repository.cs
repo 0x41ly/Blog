@@ -285,15 +285,27 @@ namespace Blog.Data.Repository
 
         public bool AddComment(Comment comment)
         {
-            if (GetComment(comment.CommentId) != null)
+            if (GetArticle(comment.ArticleId) != null)
             {
+                if (comment.ParentId == Guid.Empty)
+                {
+                    comment.level = 0;
+                }
+                else if(GetComment(comment.ParentId) != null)
+                {
+                    comment.level = GetCommentlevelByID(comment.ParentId) + 1;
+                }
+                else
+                {
+                    return false;
+                }
                 _ctx.Comments.Add(comment);
                 return true;
             }
             return false;
         }
 
-        public ArticleViewModel GetArticleViewModel(Guid id)
+        public ArticleViewModel GetArticleViewModel(Guid id, string UserId)
         {
             var ArticleViewModel = new ArticleViewModel();
             ArticleViewModel.Genres = GetGenres();
@@ -305,6 +317,8 @@ namespace Blog.Data.Repository
                 ArticleViewModel.Author = GetUserProfile(ArticleViewModel.Article.AuthorId);
                 ArticleViewModel.SideBarArticles = GetSideBarArticles(ArticleViewModel.Article.GenreName);
                 ArticleViewModel.MainComments = GetComments(id, 0);
+                ArticleViewModel.isPinned = GetPinnedArticles(UserId).Any(a => a.Id == id);
+                ArticleViewModel.isLiked = _ctx.ArticleLikes.Any(a => a.Id == id & a.UserId ==UserId);
             }
             else
             {
@@ -370,6 +384,7 @@ namespace Blog.Data.Repository
                     .FirstOrDefault();
             UserProfile userProfile = new UserProfile
             {
+                UserId = user.Id,
                 ProfilePicture = user.ProfilePicture ,
                 UserName = user.UserName ,
                 PlanType = user.PlanType,
@@ -489,7 +504,7 @@ namespace Blog.Data.Repository
             return article.ArticleId;
         }
 
-        public int GetCommentlevelByID(Guid id)
+        private int GetCommentlevelByID(Guid id)
         {
             var level = _ctx.Comments
                 .Where(c => c.CommentId == id)
@@ -535,28 +550,68 @@ namespace Blog.Data.Repository
         public AdminViewModel AdminViewModel(string UserId)
         {
 
-            return new AdminViewModel();
+            var AdminViewModel =  new AdminViewModel {
+                UsersCount = GetUsersCount(),
+                ArticleCount = GetArticleCount(),
+                MostInteractionsArticleViewModel = GetMostLikedArticles(),
+                userProfile = GetUserProfile(UserId),
+                UserRequestedPremium = GetUserRequestedPremium()
+            };
+            return AdminViewModel;
         }
 
-        public void RequestPremium(string UserId)
+        private List<UserProfile> GetUserRequestedPremium()
+        {
+            return (List<UserProfile>)_ctx.Users
+                .Where(a => a.RequestedPremium)
+                .Select(user => new UserProfile
+                {
+                    UserId = user.Id,
+                    ProfilePicture = user.ProfilePicture,
+                    UserName = user.UserName,
+                    PlanType = user.PlanType,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    Email = user.Email,
+                    Gender = user.Gender,
+                    DOB = user.DOB
+                });
+
+            
+        }
+
+        public bool RequestPremium(string UserId)
         {
             var user = _ctx.Users
                 .Where(u => u.Id == UserId)
                 .FirstOrDefault();
-            user.RequestedPremium = true;
-            _ctx.Users.Update(user);
+            if (user != null)
+            {
+                user.RequestedPremium = true;
+                _ctx.Users.Update(user);
+                return true;
+            }
+            return false;   
+            
                 
 
          
         }
 
-        public void GivePremium(string UserId)
+        public bool GivePremium(string UserId)
         {
             var user = _ctx.Users
                 .Where(u => u.Id == UserId)
                 .FirstOrDefault();
-            user.PlanType = "Premium";
-            _ctx.Users.Update(user);
+            if (user != null)
+            {
+                user.PlanType = "Premium";
+                user.RequestedPremium = false;
+                _ctx.Users.Update(user);
+                
+                return true;
+            }
+            return false;
         }
 
         public bool RemoveUser(string UserId)
@@ -601,7 +656,7 @@ namespace Blog.Data.Repository
             return "Error"; 
         }
 
-        public string GlobalPin(string UserId, Guid ArticleId)
+        public string GlobalPin(Guid ArticleId)
         {
             var article = GetArticle(ArticleId);
             if (article != null)

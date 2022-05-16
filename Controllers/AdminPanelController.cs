@@ -40,4 +40,60 @@ public class AdminPanelController : Controller
         var vm = _repo.AdminViewModel(UserId);
         return View(vm);
     }
+
+    [Authorize]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> RemoveUser(string UserId)
+    {
+        if (_repo.RemoveUser(UserId)){
+
+            await _repo.SaveChangesAsync();
+            TempData["Message"] = "success: Successfully removed";
+
+            return RedirectToAction("Index");
+        }
+        TempData["Message"] = "warning: User does not exist";
+        return RedirectToAction("Index");
+    }
+    [Authorize]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> GivePremium(string UserId)
+    {
+        if (_repo.GivePremium(UserId))
+        {
+
+            await _repo.SaveChangesAsync();
+            TempData["Message"] = "success: Successfully gived";
+
+            return RedirectToAction("Index");
+        }
+        TempData["Message"] = "warning: User does not exist";
+        return RedirectToAction("Index");
+    }
+    [Authorize]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> GlobalPin(Guid ArticleId)
+    {
+        var cond = _repo.GlobalPin(ArticleId);
+        if (cond == "Added")
+        {
+
+            await _repo.SaveChangesAsync();
+            TempData["Message"] = "success: Successfully Added";
+
+            return RedirectToAction("Index");
+        }
+        else if (cond == "Removed")
+        {
+            await _repo.SaveChangesAsync();
+            TempData["Message"] = "success: Successfully Added";
+
+            return RedirectToAction("Index");
+        }
+        TempData["Message"] = "warning: Article does not exist";
+        return RedirectToAction("Index");
+    }
 }

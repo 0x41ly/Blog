@@ -9,7 +9,7 @@ namespace Blog.Data.Repository
     {
 
         
-        ArticleViewModel GetArticleViewModel(Guid id);
+        ArticleViewModel GetArticleViewModel(Guid id, string UserId);
         IndexViewModel GetIndexViewModel(int pageNumber, string category, string search, string UserId);
         void AddArticle(Article article);
         bool UpdateArticle(Article article);
@@ -23,17 +23,17 @@ namespace Blog.Data.Repository
         Guid? GetFirstArticleIdByGenre(string Genre);
         Guid GetArticleId(Guid CommentId);
         Task<bool> SaveChangesAsync();
-        int GetCommentlevelByID(Guid id);
+
         Article? GetArticle(Guid id);
 
         bool Recommend(Guid ArticleId, string UserId);
         AdminViewModel AdminViewModel(string UserId);
-        void RequestPremium(string UserId);
-        void GivePremium(string UserId);
+        bool RequestPremium(string UserId);
+        bool GivePremium(string UserId);
 
         bool RemoveUser(string UserId);
         string LocalPin(string UserId, Guid ArticleId);
-        string GlobalPin(string UserId, Guid ArticleId);
+        string GlobalPin(Guid ArticleId);
 
     }
 }
