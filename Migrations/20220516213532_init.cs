@@ -215,7 +215,7 @@ namespace Blog.Migrations
                 {
                     CommentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ArticleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ParentId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    ParentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Message = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     AuthorId = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: false),
                     level = table.Column<int>(type: "int", nullable: false),
@@ -236,12 +236,7 @@ namespace Blog.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id"
                         );
-                    table.ForeignKey(
-                        name: "FK_Comments_Comments_ParentId",
-                        column: x => x.ParentId,
-                        principalTable: "Comments",
-                        principalColumn: "CommentId"
-                        );
+                    
                 });
 
             migrationBuilder.CreateTable(

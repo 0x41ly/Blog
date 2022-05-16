@@ -287,13 +287,13 @@ namespace Blog.Data.Repository
         {
             if (GetArticle(comment.ArticleId) != null)
             {
-                if (comment.ParentId == null)
+                if (comment.ParentId == Guid.Empty)
                 {
                     comment.level = 0;
                 }
-                else if(GetComment(comment.ParentId.Value) != null)
+                else if(GetComment(comment.ParentId) != null)
                 {
-                    comment.level = GetCommentlevelByID(comment.ParentId.Value) + 1;
+                    comment.level = GetCommentlevelByID(comment.ParentId) + 1;
                 }
                 else
                 {
@@ -316,7 +316,11 @@ namespace Blog.Data.Repository
                 ArticleViewModel.ArticleViews = GetArticleViews(id);
                 ArticleViewModel.Author = GetUserProfile(ArticleViewModel.Article.AuthorId);
                 ArticleViewModel.SideBarArticles = GetSideBarArticles(ArticleViewModel.Article.GenreName);
+<<<<<<< HEAD
                 //ArticleViewModel.MainComments = GetComments(id, 0);
+=======
+                ArticleViewModel.MainComments = GetComments(id);
+>>>>>>> 94c94b674d9036c52dd6cbd9f240a8c0d2d97525
                 ArticleViewModel.isPinned = GetPinnedArticles(UserId).Any(a => a.Id == id);
                 ArticleViewModel.isLiked = _ctx.ArticleLikes.Any(a => a.Id == id & a.UserId ==UserId);
             }
@@ -351,11 +355,16 @@ namespace Blog.Data.Repository
             return _ctx.CommentLikes
                     .Where(a => a.CommentId == id).Count();
         }
+<<<<<<< HEAD
         private List<CommentViewModel>? GetComments(Guid? id, int level)
+=======
+        private List<CommentViewModel>? GetComments(Guid id)
+>>>>>>> 94c94b674d9036c52dd6cbd9f240a8c0d2d97525
         {
             var CommentsViewModdel = new List<CommentViewModel>();
             Console.WriteLine(id);
             var comments = _ctx.Comments
+<<<<<<< HEAD
  
                 .ToList();
             Console.WriteLine(comments.Count());
@@ -371,9 +380,33 @@ namespace Blog.Data.Repository
             //    //}
             //    CommentsViewModdel.Add(commentViewModel);
             //}
+=======
+                .ToList();
+            var level0Comments = comments.Where(c => c.level == 0);
+            foreach (var comment in level0Comments)
+            {
+                CommentsViewModdel.Add(commentToViewComment(comment, comments));
+            }
+>>>>>>> 94c94b674d9036c52dd6cbd9f240a8c0d2d97525
 
             return CommentsViewModdel;
         }
+
+        private CommentViewModel commentToViewComment(Comment comment, List<Comment> comments)
+        {   
+            var nextLevelComments = comments.Where(c => c.level == comment.level + 1);
+            var commentViewModel = new CommentViewModel();
+            commentViewModel.Comment = comment;
+            commentViewModel.Creator = GetUserProfile(comment.AuthorId);
+            commentViewModel.CommentLikes = GetCommentLikes(comment.CommentId);
+            foreach (var nextlevelcomment in nextLevelComments)
+            {
+                commentViewModel.SubComments.Add(commentToViewComment(nextlevelcomment, comments));
+            }
+
+            return commentViewModel;
+        }
+
         public Article? GetArticle(Guid id)
         {
             return _ctx.Articles
@@ -523,7 +556,12 @@ namespace Blog.Data.Repository
 
         public void RemoveComment(Guid id)
         {
+            var subcomments = _ctx.Comments.Where(c => c.ParentId == id).ToList();
             _ctx.Comments.Remove(GetComment(id));
+            foreach(var subcomment in subcomments)
+            {
+                _ctx.Comments.Remove(subcomment);
+            }
         }
 
         public bool Recommend(Guid ArticleId, string UserId)
