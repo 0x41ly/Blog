@@ -283,7 +283,7 @@ namespace Blog.Data.Repository
             return false;
         }
 
-        public bool AddComment(Comment comment)
+        public string AddComment(Comment comment)
         {
             if (GetArticle(comment.ArticleId) != null)
             {
@@ -291,18 +291,19 @@ namespace Blog.Data.Repository
                 {
                     comment.level = 0;
                 }
-                else if(GetComment(comment.ParentId) != null)
+                else if(GetComment(comment.ParentId) != null )
                 {
                     comment.level = GetCommentlevelByID(comment.ParentId) + 1;
+                    if (comment.level >= 3) { return "levelLemit"; }
                 }
                 else
                 {
-                    return false;
+                    return "parentNotFound";
                 }
                 _ctx.Comments.Add(comment);
-                return true;
+                return "success";
             }
-            return false;
+            return "articleNotFound";
         }
 
         public ArticleViewModel GetArticleViewModel(Guid id, string UserId)
@@ -359,7 +360,7 @@ namespace Blog.Data.Repository
             var level0Comments = comments.Where(c => c.level == 0);
             foreach (var comment in level0Comments)
             {
-                CommentsViewModdel.Add(commentToViewComment(comment, comments));
+                CommentsViewModdel.Add(commentToViewComment(comment, comments.Except(level0Comments).ToList()));
             }
 
             return CommentsViewModdel;
@@ -372,11 +373,13 @@ namespace Blog.Data.Repository
             commentViewModel.Comment = comment;
             commentViewModel.Creator = GetUserProfile(comment.AuthorId);
             commentViewModel.CommentLikes = GetCommentLikes(comment.CommentId);
-            foreach (var nextlevelcomment in nextLevelComments)
+            if (comment.level < 3)
             {
-                commentViewModel.SubComments.Add(commentToViewComment(nextlevelcomment, comments));
+                foreach (var nextlevelcomment in nextLevelComments)
+                {
+                    commentViewModel.SubComments.Add(commentToViewComment(nextlevelcomment, comments.Except(nextLevelComments).ToList()));
+                }
             }
-
             return commentViewModel;
         }
 

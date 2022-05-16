@@ -145,18 +145,30 @@ public class HomeController : Controller
         comment.Created = DateTime.Now;
         var user = await _userManager.GetUserAsync(User);
         comment.AuthorId = await _userManager.GetUserIdAsync(user);
-        
-        if (_repo.AddComment(comment))
+        var addCommend = _repo.AddComment(comment);
+        if (addCommend == "success")
         {
             await _repo.SaveChangesAsync();
+            TempData["Message"] = "success: Successfully Added The comment";
+            return RedirectToAction("Article", new { id = comment.ArticleId });
+        }
+        else if(addCommend == "parentNotFound")
+        {
+            TempData["Message"] = "warning: You are trying to add a subcomment to non existanct comment";
+            return RedirectToAction("Article", new { id = comment.ArticleId });
+        }
+        else if(addCommend == "articleNotFound")
+        {
+            TempData["Message"] = "warning: You are trying to add a comment to non existanct article";
+            return RedirectToAction("Index");
         }
         else
         {
-            TempData["Message"] = "warning: You either trying to add a comment to a non existent article or a subcomment to non existanct comment";
-            return RedirectToAction("Index");
+            TempData["Message"] = "warning: The main comment reached its subcomment limit";
+            TempData["Message"] = "warning: The main comment reached its subcomment limit";
+            return RedirectToAction("Article", new { id = comment.ArticleId });
         }
-        TempData["Message"] = "success: Successfully Added The comment";
-        return RedirectToAction("Article", new { id = comment.ArticleId });
+        
         
 
         
