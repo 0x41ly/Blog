@@ -287,13 +287,13 @@ namespace Blog.Data.Repository
         {
             if (GetArticle(comment.ArticleId) != null)
             {
-                if (comment.ParentId == Guid.Empty)
+                if (comment.ParentId == null)
                 {
                     comment.level = 0;
                 }
-                else if(GetComment(comment.ParentId) != null)
+                else if(GetComment(comment.ParentId.Value) != null)
                 {
-                    comment.level = GetCommentlevelByID(comment.ParentId) + 1;
+                    comment.level = GetCommentlevelByID(comment.ParentId.Value) + 1;
                 }
                 else
                 {

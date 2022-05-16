@@ -16,7 +16,7 @@ namespace Blog.Models
 
         [Required]
         [ForeignKey("CommentId")]
-        public Guid ParentId { get; set; }
+        public Guid? ParentId { get; set; }
 
 
         [Required]
