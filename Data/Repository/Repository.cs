@@ -285,8 +285,20 @@ namespace Blog.Data.Repository
 
         public bool AddComment(Comment comment)
         {
-            if (GetComment(comment.CommentId) != null)
+            if (GetArticle(comment.ArticleId) != null)
             {
+                if (comment.ParentId == Guid.Empty)
+                {
+                    comment.level = 0;
+                }
+                else if(GetComment(comment.ParentId) != null)
+                {
+                    comment.level = GetCommentlevelByID(comment.ParentId) + 1;
+                }
+                else
+                {
+                    return false;
+                }
                 _ctx.Comments.Add(comment);
                 return true;
             }
@@ -492,7 +504,7 @@ namespace Blog.Data.Repository
             return article.ArticleId;
         }
 
-        public int GetCommentlevelByID(Guid id)
+        private int GetCommentlevelByID(Guid id)
         {
             var level = _ctx.Comments
                 .Where(c => c.CommentId == id)

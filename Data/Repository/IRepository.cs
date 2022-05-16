@@ -23,7 +23,7 @@ namespace Blog.Data.Repository
         Guid? GetFirstArticleIdByGenre(string Genre);
         Guid GetArticleId(Guid CommentId);
         Task<bool> SaveChangesAsync();
-        int GetCommentlevelByID(Guid id);
+
         Article? GetArticle(Guid id);
 
         bool Recommend(Guid ArticleId, string UserId);

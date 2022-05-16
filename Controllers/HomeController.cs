@@ -32,7 +32,9 @@ public class HomeController : Controller
 
     public IActionResult Index(int pageNumber, string category, string search)
     {
-
+        
+        category = System.Net.WebUtility.HtmlEncode(category);
+        search = System.Net.WebUtility.HtmlEncode(search);
         var vm = _repo.GetIndexViewModel(pageNumber, category, search, _userManager.GetUserId(User));
         return View(vm);
     }
@@ -143,14 +145,7 @@ public class HomeController : Controller
         comment.Created = DateTime.Now;
         var user = await _userManager.GetUserAsync(User);
         comment.AuthorId = await _userManager.GetUserIdAsync(user);
-        if (comment.ParentId == Guid.Empty)
-        {
-            comment.level = 0;
-        }
-        else
-        {
-            comment.level = _repo.GetCommentlevelByID(comment.ParentId) + 1 ;
-        }
+        
         if (_repo.AddComment(comment))
         {
             await _repo.SaveChangesAsync();
