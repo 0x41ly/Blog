@@ -316,7 +316,7 @@ namespace Blog.Data.Repository
                 ArticleViewModel.ArticleViews = GetArticleViews(id);
                 ArticleViewModel.Author = GetUserProfile(ArticleViewModel.Article.AuthorId);
                 ArticleViewModel.SideBarArticles = GetSideBarArticles(ArticleViewModel.Article.GenreName);
-                ArticleViewModel.MainComments = GetComments(id, 0);
+                //ArticleViewModel.MainComments = GetComments(id, 0);
                 ArticleViewModel.isPinned = GetPinnedArticles(UserId).Any(a => a.Id == id);
                 ArticleViewModel.isLiked = _ctx.ArticleLikes.Any(a => a.Id == id & a.UserId ==UserId);
             }
@@ -351,23 +351,26 @@ namespace Blog.Data.Repository
             return _ctx.CommentLikes
                     .Where(a => a.CommentId == id).Count();
         }
-        private List<CommentViewModel>? GetComments(Guid id, int level)
+        private List<CommentViewModel>? GetComments(Guid? id, int level)
         {
             var CommentsViewModdel = new List<CommentViewModel>();
+            Console.WriteLine(id);
             var comments = _ctx.Comments
-                .Where(c => c.ArticleId == id & c.level == level).ToList();
-            foreach (var comment in comments)
-            {
-                CommentViewModel commentViewModel = new CommentViewModel();
-                commentViewModel.Comment = comment;
-                commentViewModel.Creator = GetUserProfile(comment.AuthorId);
-                commentViewModel.CommentLikes = GetCommentLikes(comment.CommentId);
-                if (comment.level < 3)
-                {
-                    commentViewModel.SubComments = GetComments(id, comment.level +1 );
-                }
-                CommentsViewModdel.Add(commentViewModel);
-            }
+ 
+                .ToList();
+            Console.WriteLine(comments.Count());
+            //foreach (var comment in comments)
+            //{
+            //    CommentViewModel commentViewModel = new CommentViewModel();
+            //    commentViewModel.Comment = comment;
+            //    commentViewModel.Creator = GetUserProfile(comment.AuthorId);
+            //    commentViewModel.CommentLikes = GetCommentLikes(comment.CommentId);
+            //    //if (comment.level < 3)
+            //    //{
+            //    //    commentViewModel.SubComments = GetComments(id, comment.level +1 );
+            //    //}
+            //    CommentsViewModdel.Add(commentViewModel);
+            //}
 
             return CommentsViewModdel;
         }
