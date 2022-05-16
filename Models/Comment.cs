@@ -23,6 +23,7 @@ namespace Blog.Models
         public string Message { get; set; }
 
         [MaxLength(450)]
+
         public string AuthorId { get; set; }
 
         [Range(0, 2)]
@@ -31,7 +32,7 @@ namespace Blog.Models
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd,hh:mm tt}", ApplyFormatInEditMode = true)]
         public DateTime Created { get; set; } = DateTime.Now;
-
+        [ForeignKey("AuthorId")]
         public virtual BlogUser Creator { get; set; }
         [ForeignKey("ArticleId")]
         public virtual Article Article { get; set; }
