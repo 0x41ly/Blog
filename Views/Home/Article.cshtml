@@ -70,7 +70,7 @@
                 </svg>
               <i class="bi bi-tag-fill"><a class="btn btn-link" onclick="document.getElementById('Genre-form').submit();">@Html.DisplayFor(model => model.Article.Categories)</a></i></div>
               <div class="Createcomment-div">
-               @{ await Html.RenderPartialAsync("_CreateComment", new Comment {ArticleId=Model.Article.ArticleId ,ParentId=Guid.Empty }); }
+               @{ await Html.RenderPartialAsync("_CreateComment", new Comment {ArticleId=Model.Article.ArticleId ,ParentId=null }); }
             </div>
       @*</div style="position: relative;top: 102px;">*@
 <!--###########################icon##########################-->
