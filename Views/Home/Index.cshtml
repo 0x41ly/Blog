@@ -8,37 +8,15 @@
     ViewData["Title"] = "Home Page";
     var user = await UserManager.GetUserAsync(User);
 }
- @{
-    Html.RenderPartial("../Shared/_StatusMessage", (string)(TempData["Message"])); 
-   }
-  @*<!-- ======= Header ======= -->
-  <header id="header" class="fixed-top d-flex align-items-center header-inner-pages">
-    <div class="container d-flex align-items-center justify-content-between">
-      
-          <form id="Genre-form" asp-controller="Home" asp-action="Genre" method="post">
-               <nav id="navbar" class="navbar">
-               <ul>
-                    @foreach (var genre in Model.Genres)
-                        {
-                                  
-                            <input type="hidden" name="GenreName" value="@genre" />
-                            <li><a class="nav-link scrollto " onclick="document.getElementById('Genre-form').submit();">@genre</a></li>
-                     
-               
-                         }
-                </ul>
-                 </nav>
-            </form>  
-       
-    </div>
-  </header><!-- End Header -->
-*@
+
 <partial name="_Genres"  model="Model.Genres"/>
   <main id="main">
-
+ 
     <!-- ======= Breadcrumbs ======= -->
-    <section id="breadcrumbs" class="breadcrumbs">
-       
+    <section id="breadcrumbs" class="breadcrumbs" >
+  @{
+    Html.RenderPartial("../Shared/_StatusMessage", (string)(TempData["Message"])); 
+   }     
     <div class="row">
         @if (SignInManager.IsSignedIn(User))
             {

@@ -1,10 +1,22 @@
-﻿
+﻿@using Blog.ViewModels
 @model Blog.Models.Comment
+<style>
+    body{background: #eee}
+    .date{font-size: 11px}
+    .comment-text{font-size: 12px}
+    .fs-12{font-size: 12px}
+    .shadow-none{box-shadow: none}
+    .name{color: #007bff}
+    .cursor:hover{color: blue}
+    .cursor{cursor: pointer}
+    .textarea{resize: none}
+    #width{ width: 744px;}
+    .commentsize{width: 459px;}
+</style>
 
 
-
-
-<form asp-action="Comment" asp-controller="Topics">
+<div class="commentsize">
+ <form asp-action="Comment" asp-controller="Home" method="post">
     <input asp-for="ArticleId" type="hidden" value="@Model.ArticleId"/>
     <input asp-for="ParentId" type="hidden" value="@Model.ParentId"/>
     
@@ -15,3 +27,25 @@
     </div>
     <input type="submit" style="display:none"/>
 </form>
+</div>
+@*<div class="container mt-5">
+    <div class="d-flex justify-content-center row">
+        <div class="col-md-8">
+            <div class="d-flex flex-column comment-section">
+                    <div class="d-flex flex-row fs-12" style="position: relative;top: -112px;right: 158px;">
+                        <div class="like p-2 cursor"><i class="fa fa-thumbs-o-up"></i><span class="ml-1">Like</span></div>
+                        <div class="like p-2 cursor"><i class="fa fa-commenting-o"></i><span class="ml-1">Comment</span></div>
+                    </div>
+                  @* <button type="submit" class="btn btn-primary" style="position: relative;top: -16px;">
+    		            Create
+    		        </button>*@
+ @*                   <div class="mt-2 text-right"style="position: relative;top: -86px;right: 104px;">
+                        
+                        <button class="btn btn-outline-primary btn-sm ml-1 shadow-none" type="submit">Cancel</button></div>
+                
+            </div*@>
+@*        </div>
+    </div>
+</div>*@
+ <script src="~/Article/js/comment.js"asp-append-version="true"></script>
+<link rel="stylesheet" href="~/Article/css/comment.css"asp-append-version="true" />

@@ -22,7 +22,9 @@
 	        </ul>
 	      </div>
     	</nav>
-
+ @{
+    Html.RenderPartial("../Shared/_StatusMessage", (string)(TempData["Message"])); 
+   }
         <!-- Page Content  -->
       <div id="content" class="p-4 p-md-5" style="position: relative;top: 31px;">
 
@@ -52,11 +54,7 @@
 
           </div>
         </nav>
-@{
-    Html.RenderPartial("../Shared/_StatusMessage", (string)(TempData["Message"])); 
-}
-
-        <h2 class="mb-4">@Html.DisplayFor(model => model.Article.Title)</h2>
+       <h2 class="mb-4">@Html.DisplayFor(model => model.Article.Title)</h2>
         <ul><li style="list-style:none;margin-left: -30px;margin-top: -15px;"><span class="strong" style="color:var(--gfg-color-lg);font-family:var(--font-sofia);font-size:15px">Last Updated :</span>
             <span style="color:var(--gfg-color-lg);font-family:var(--font-sofia);font-size:15px">@Html.DisplayFor(model => model.Article.LastUpdated)</span><p></p>
             </li>
@@ -71,9 +69,12 @@
                 <path d="M2 1a1 1 0 0 0-1 1v4.586a1 1 0 0 0 .293.707l7 7a1 1 0 0 0 1.414 0l4.586-4.586a1 1 0 0 0 0-1.414l-7-7A1 1 0 0 0 6.586 1H2zm4 3.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
                 </svg>
               <i class="bi bi-tag-fill"><a class="btn btn-link" onclick="document.getElementById('Genre-form').submit();">@Html.DisplayFor(model => model.Article.Categories)</a></i></div>
-      </div style="position: relative;top: 102px;">
+              <div class="Createcomment-div">
+               @{ await Html.RenderPartialAsync("_CreateComment", new Comment {ArticleId=Model.Article.ArticleId ,ParentId=Guid.Empty }); }
+            </div>
+      @*</div style="position: relative;top: 102px;">*@
 <!--###########################icon##########################-->
-      <div class="container" style="position: relative;top: 60px;r;/* right: 68px; */">
+      @* <div class="container" style="position: relative;top: 60px;r;/* right: 68px; */">
           <!--###########################Pin##########################-->
           <form id="Article-form" asp-controller="Home" asp-action="ArticlePin" method="post" style="position: relative;top: 31px;right: -315px;width: 38px;">
               <input type="hidden" name="ArticleId" value="@Model.Article.ArticleId" />
@@ -94,7 +95,7 @@
           <!--###########################Edit##########################-->
           <a asp-controller=Home asp-action=UpdateArticle asp-route-id="@Model.Article.ArticleId" class="btn btn-light" role="button" aria-disabled="true" data-toggle="tooltip" data-placement="down" title="Edit Post" style="position: relative;right: -334px;width: 41px;height: 42px;" > </a>
           @*<button type="button" class="btn btn-light" data-toggle="tooltip" data-placement="down" title="Edit Post" style="position: relative;right: -334px;width: 41px;height: 42px;"></button>*@
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16" style="width: 74px;position: relative;right: -273px;height: 29px;">
+        @* <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16" style="width: 74px;position: relative;right: -273px;height: 29px;">
             <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
             <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
         </svg>
@@ -103,21 +104,55 @@
         <button type="button" class="btn btn-light" data-toggle="tooltip" data-placement="down" title="Remove Post" style="position: relative;right: -422px;width: 49px;height: 38px;top: -44px;"></button>
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16" style="position: relative;right: -381px;height: 41px;width: 25px;top: -44px;">
             <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z"/>
-        </svg>
-        <!--########################### End Remove##########################-->
-        <!--###########################Recommed##########################-->
+        </svg>        <!--###########################Recommed##########################-->
+
         <button type="button" class="btn btn-light" data-toggle="tooltip" data-placement="down" title="Recommed Post" style="position: relative;right: -433px;width: 53px;height: 43px;top: -45px;"></button>
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-square-fill" viewBox="0 0 16 16" style="position: relative;right: -384px;width: 38px;height: 25px;top: -45px;">
           <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm10.03 4.97a.75.75 0 0 1 .011 1.05l-3.992 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.75.75 0 0 1 1.08-.022z"/>
         </svg>
-        <!--########################### End Recommed##########################-->
+        <!--########################### End Recommed##########################-->*@
+        
+                @*<a class="btn btn-outline-primary" asp-controller="Home" asp-action="AddArticle" role="button">Create Post</a>*@
+            <!-- Button trigger modal -->
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter">
+  Delet
+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">Are you sure??</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+         <p>You are about to delete this Article!!!!</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal"asp-controller="Home" asp-action="Article"  asp-route-id="@Model.Article.ArticleId">Close</button>
+        <form method="post" asp-action="RemoveArticle" asp-controller="Home">
+            <input type="hidden" name="id" value="@Model.Article.ArticleId"/>
+            <input type="submit" value="Delete" class="btn btn-primary btn-danger" /> 
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+        
+
+        <!--########################### End Remove##########################-->
+
       </div>
 <!--########################### End icon##########################-->
-<div class="container"style="position: relative;top: 322px;right: 512px;">
-    <div class="topics-column">
-        <div class="back">
+
+    
+ @*   <div class="container" style="position: relative;top: -41px;right: -92px;">  <div class="topics-column">  <div class="back">
             <a asp-action="Index"> &lt;&lt; Back to List</a>
-        </div>
+        </div>*@
      @* <div id="topic-and-comments-container" class="topic-and-comments-container theme">
         <div id="cristians-topic" class="topic-container">
           <div class="topic-content-container">
@@ -147,7 +182,7 @@
           </div>
         </div>*@
         
-            <div class="Createcomment-div">
+          @*  <div class="Createcomment-div">
                @{ await Html.RenderPartialAsync("_CreateComment", new Comment { ArticleId = Model.Article.ArticleId, ParentId= Guid.Empty }); }
             </div>
             
@@ -172,7 +207,7 @@
               <div>
                 <p>@Html.DisplayFor(modelItem =>  commentViewModel.Comment.Message)</p>
               </div>
-              
+             
               
                 @{
                     await Html.RenderPartialAsync("_SubComments", commentViewModel.Comment);
@@ -185,11 +220,11 @@
                 
             </div>
           </div>
-          }
+          } 
         </div>
         <br>
       </div>
-    </div>
+    </div>*@
  @*   <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous"asp-append-version="true" >
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>*@
@@ -197,7 +232,6 @@
     <script src="~/Article/js/popper.js"asp-append-version="true"></script>
     <script src="~/Article/js/bootstrap.min.js"asp-append-version="true"></script>
     <script src="~/Article/js/main.js"asp-append-version="true"></script>
-
     <link rel="stylesheet" href="~/HomeStyle/assets/css/style.css" asp-append-version="true" />
 
    <link rel="stylesheet" href="~/Article/css/style.css"asp-append-version="true" />
@@ -205,6 +239,7 @@
 
 <link rel="stylesheet" href="~/Article/css/font.css"asp-append-version="true" />
 <link rel="stylesheet" href="~/Article/css/googleapis.css"asp-append-version="true" />
+
 
 
 

@@ -4,20 +4,18 @@
   <header id="header" class="fixed-top d-flex align-items-center header-inner-pages">
     <div class="container d-flex align-items-center justify-content-between">
       
-          <form id="Genre-form" asp-controller="Home" asp-action="Genre" method="post">
-               <nav id="navbar" class="navbar">
+   <nav id="navbar" class="navbar">
                <ul>
                     @foreach (var genre in Model)
                         {
-                                  
+                            <form id="@genre-form" asp-controller="Home" asp-action="Genre" method="post">      
                             <input type="hidden" name="GenreName" value="@genre" />
-                            <li><a class="nav-link scrollto " onclick="document.getElementById('Genre-form').submit();">@genre</a></li>
+                            <li><a class="nav-link scrollto " onclick="document.getElementById('@genre-form').submit();">@genre</a></li>
                      
-               
+               </form>
                          }
                 </ul>
-                 </nav>
-            </form>  
+                 </nav> 
        
     </div>
   </header><!-- End Header -->
