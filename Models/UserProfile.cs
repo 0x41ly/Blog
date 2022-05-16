@@ -1,6 +1,7 @@
 namespace Blog.Models;
 public class UserProfile
 {
+    public string UserId { get; set; }
     public byte[]? ProfilePicture { get; set; }
 
     public string  UserName { get; set; }

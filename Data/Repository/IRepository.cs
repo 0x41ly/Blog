@@ -28,12 +28,12 @@ namespace Blog.Data.Repository
 
         bool Recommend(Guid ArticleId, string UserId);
         AdminViewModel AdminViewModel(string UserId);
-        void RequestPremium(string UserId);
-        void GivePremium(string UserId);
+        bool RequestPremium(string UserId);
+        bool GivePremium(string UserId);
 
         bool RemoveUser(string UserId);
         string LocalPin(string UserId, Guid ArticleId);
-        string GlobalPin(string UserId, Guid ArticleId);
+        string GlobalPin(Guid ArticleId);
 
     }
 }

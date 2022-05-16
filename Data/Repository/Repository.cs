@@ -372,6 +372,7 @@ namespace Blog.Data.Repository
                     .FirstOrDefault();
             UserProfile userProfile = new UserProfile
             {
+                UserId = user.Id,
                 ProfilePicture = user.ProfilePicture ,
                 UserName = user.UserName ,
                 PlanType = user.PlanType,
@@ -553,6 +554,7 @@ namespace Blog.Data.Repository
                 .Where(a => a.RequestedPremium)
                 .Select(user => new UserProfile
                 {
+                    UserId = user.Id,
                     ProfilePicture = user.ProfilePicture,
                     UserName = user.UserName,
                     PlanType = user.PlanType,
@@ -566,25 +568,38 @@ namespace Blog.Data.Repository
             
         }
 
-        public void RequestPremium(string UserId)
+        public bool RequestPremium(string UserId)
         {
             var user = _ctx.Users
                 .Where(u => u.Id == UserId)
                 .FirstOrDefault();
-            user.RequestedPremium = true;
-            _ctx.Users.Update(user);
+            if (user != null)
+            {
+                user.RequestedPremium = true;
+                _ctx.Users.Update(user);
+                return true;
+            }
+            return false;   
+            
                 
 
          
         }
 
-        public void GivePremium(string UserId)
+        public bool GivePremium(string UserId)
         {
             var user = _ctx.Users
                 .Where(u => u.Id == UserId)
                 .FirstOrDefault();
-            user.PlanType = "Premium";
-            _ctx.Users.Update(user);
+            if (user != null)
+            {
+                user.PlanType = "Premium";
+                user.RequestedPremium = false;
+                _ctx.Users.Update(user);
+                
+                return true;
+            }
+            return false;
         }
 
         public bool RemoveUser(string UserId)
@@ -629,7 +644,7 @@ namespace Blog.Data.Repository
             return "Error"; 
         }
 
-        public string GlobalPin(string UserId, Guid ArticleId)
+        public string GlobalPin(Guid ArticleId)
         {
             var article = GetArticle(ArticleId);
             if (article != null)
