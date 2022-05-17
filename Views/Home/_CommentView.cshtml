@@ -33,7 +33,7 @@
                        }
                 </div> 
             @{
-                foreach (var subcommentview in Model.SubComments)
+                @foreach (var subcommentview in Model.SubComments)
                 {
                     <partial name="_CommentView" model="subcommentview"/>
                 }
