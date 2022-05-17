@@ -354,20 +354,17 @@ public class HomeController : Controller
     [Authorize]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> RemoveComment(Guid? id)
+    public async Task<IActionResult> RemoveComment(Guid id)
     {
-        if (id == null)
-        {
-            return NotFound();
-        }
+        
         var user = await _userManager.GetUserAsync(User);
         var UserId = await _userManager.GetUserIdAsync(user);
-        var comment = _repo.GetArticle(id.Value);
+        var comment = _repo.GetComment(id);
         if (comment != null)
         {
             if (comment.AuthorId == UserId | User.IsInRole("BlogOwner") | User.IsInRole("Admin"))
             {
-                _repo.RemoveArticle(id.Value);
+                _repo.RemoveArticle(id);
                 await _repo.SaveChangesAsync();
                 return RedirectToAction("Article", new { id = comment.ArticleId } );
             }
