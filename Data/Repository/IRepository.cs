@@ -34,6 +34,6 @@ namespace Blog.Data.Repository
         bool RemoveUser(string UserId);
         string LocalPin(string UserId, Guid ArticleId);
         string GlobalPin(Guid ArticleId);
-
+        public Comment? GetComment(Guid commentId);
     }
 }
