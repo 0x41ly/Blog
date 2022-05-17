@@ -143,6 +143,11 @@ public class HomeController : Controller
         comment.Message = System.Net.WebUtility.HtmlEncode(comment.Message);
         comment.CommentId = Guid.NewGuid();
         comment.Created = DateTime.Now;
+        if (String.IsNullOrEmpty(comment.Message))
+        {
+            TempData["Message"] = "warning: Empty comments are not allowed";
+            return RedirectToAction("Article", new { id = comment.ArticleId });
+        }
         var user = await _userManager.GetUserAsync(User);
         comment.AuthorId = await _userManager.GetUserIdAsync(user);
         var addCommend = _repo.AddComment(comment);
