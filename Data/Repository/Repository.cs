@@ -363,8 +363,12 @@ namespace Blog.Data.Repository
             var CommentsViewModdel = new List<CommentViewModel>();
             Console.WriteLine(id);
             var comments = _ctx.Comments
+<<<<<<< HEAD
 
  
+=======
+                .Where(a => a.ArticleId == id)
+>>>>>>> main
                 .ToList();
             
             var level0Comments = comments.Where(c => c.level == 0);
