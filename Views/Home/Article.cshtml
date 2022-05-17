@@ -25,35 +25,11 @@
 
         <!-- Page Content  -->
       <div id="content" class="p-4 p-md-5" style="position: relative;top: 31px;">
-          @{
-         Html.RenderPartial("../Shared/_StatusMessage", (string)(TempData["Message"])); 
-          }
-        <nav class="navbar navbar-expand-lg navbar-light bg-light">
-          <div class="container-fluid">
+              @{
+             Html.RenderPartial("../Shared/_StatusMessage", (string)(TempData["Message"])); 
+              }
 
-            <button class="btn btn-dark d-inline-block d-lg-none ml-auto" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <i class="fa fa-bars"></i>
-            </button>
 
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-              <ul class="nav navbar-nav ml-auto">
-            @*    <li class="nav-item active">
-                    <a class="nav-link" href="#">Home</a>
-                </li>*@
-                @*<li class="nav-item">
-                    <a class="nav-link" href="#">About</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Portfolio</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Contact</a>
-                </li>*@
-              </ul>
-            </div>
-
-          </div>
-        </nav>
        <h2 class="mb-4">@Html.DisplayFor(model => model.Article.Title)</h2>
         <ul><li style="list-style:none;margin-left: -30px;margin-top: -15px;"><span class="strong" style="color:var(--gfg-color-lg);font-family:var(--font-sofia);font-size:15px">Last Updated :</span>
             <span style="color:var(--gfg-color-lg);font-family:var(--font-sofia);font-size:15px">@Html.DisplayFor(model => model.Article.LastUpdated)</span><p></p>
@@ -72,12 +48,14 @@
               <div class="Createcomment-div">
                @{ await Html.RenderPartialAsync("_CreateComment", new Comment {ArticleId=Model.Article.ArticleId ,ParentId=Guid.Empty }); }
             </div>
-        @{
-            foreach (var maincommentview in Model.MainComments)
-            {
-                <partial name="_CommentView" model="maincommentview"/>
-            }
-        }
+            <div class="contant" style="width: 886px;position: relative;top: 22px;">
+                @{
+                    foreach (var maincommentview in Model.MainComments)
+                    {
+                        <partial name="_CommentView" model="maincommentview"/>
+                    }
+                }
+            </div>
       @*</div style="position: relative;top: 102px;">*@
 <!--###########################icon##########################-->
       @* <div class="container" style="position: relative;top: 60px;r;/* right: 68px; */">
@@ -234,17 +212,16 @@
  @*   <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous"asp-append-version="true" >
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>*@
+    <link rel="stylesheet" href="~/HomeStyle/assets/css/style.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Article/css/style.css"asp-append-version="true" />
+    <link rel="stylesheet" href="~/Article/css/font.css"asp-append-version="true" />
+    <link rel="stylesheet" href="~/Article/css/googleapis.css"asp-append-version="true" />
+
     <script src="~/Article/js/jquery.min.js"asp-append-version="true"></script>
     <script src="~/Article/js/popper.js"asp-append-version="true"></script>
     <script src="~/Article/js/bootstrap.min.js"asp-append-version="true"></script>
     <script src="~/Article/js/main.js"asp-append-version="true"></script>
-    <link rel="stylesheet" href="~/HomeStyle/assets/css/style.css" asp-append-version="true" />
 
-   <link rel="stylesheet" href="~/Article/css/style.css"asp-append-version="true" />
-
-
-<link rel="stylesheet" href="~/Article/css/font.css"asp-append-version="true" />
-<link rel="stylesheet" href="~/Article/css/googleapis.css"asp-append-version="true" />
 
 
 
