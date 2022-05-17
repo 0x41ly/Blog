@@ -8,7 +8,7 @@
                <ul>
                     @foreach (var genre in Model)
                         {
-                            <form id="@genre-form" asp-controller="Home" asp-action="Genre" method="post">      
+                            <form id="@genre-form" asp-controller="Home" asp-action="Genre" method="post" style="position: relative;right: -13px;">      
                             <input type="hidden" name="GenreName" value="@genre" />
                             <li><a class="nav-link scrollto " onclick="document.getElementById('@genre-form').submit();">@genre</a></li>
                      

@@ -316,11 +316,9 @@ namespace Blog.Data.Repository
                 ArticleViewModel.ArticleViews = GetArticleViews(id);
                 ArticleViewModel.Author = GetUserProfile(ArticleViewModel.Article.AuthorId);
                 ArticleViewModel.SideBarArticles = GetSideBarArticles(ArticleViewModel.Article.GenreName);
-<<<<<<< HEAD
-                //ArticleViewModel.MainComments = GetComments(id, 0);
-=======
+
                 ArticleViewModel.MainComments = GetComments(id);
->>>>>>> 94c94b674d9036c52dd6cbd9f240a8c0d2d97525
+
                 ArticleViewModel.isPinned = GetPinnedArticles(UserId).Any(a => a.Id == id);
                 ArticleViewModel.isLiked = _ctx.ArticleLikes.Any(a => a.Id == id & a.UserId ==UserId);
             }
@@ -355,39 +353,25 @@ namespace Blog.Data.Repository
             return _ctx.CommentLikes
                     .Where(a => a.CommentId == id).Count();
         }
-<<<<<<< HEAD
-        private List<CommentViewModel>? GetComments(Guid? id, int level)
-=======
+
+        
+
         private List<CommentViewModel>? GetComments(Guid id)
->>>>>>> 94c94b674d9036c52dd6cbd9f240a8c0d2d97525
+
         {
             var CommentsViewModdel = new List<CommentViewModel>();
             Console.WriteLine(id);
             var comments = _ctx.Comments
-<<<<<<< HEAD
+
  
                 .ToList();
-            Console.WriteLine(comments.Count());
-            //foreach (var comment in comments)
-            //{
-            //    CommentViewModel commentViewModel = new CommentViewModel();
-            //    commentViewModel.Comment = comment;
-            //    commentViewModel.Creator = GetUserProfile(comment.AuthorId);
-            //    commentViewModel.CommentLikes = GetCommentLikes(comment.CommentId);
-            //    //if (comment.level < 3)
-            //    //{
-            //    //    commentViewModel.SubComments = GetComments(id, comment.level +1 );
-            //    //}
-            //    CommentsViewModdel.Add(commentViewModel);
-            //}
-=======
-                .ToList();
+            
             var level0Comments = comments.Where(c => c.level == 0);
             foreach (var comment in level0Comments)
             {
                 CommentsViewModdel.Add(commentToViewComment(comment, comments));
             }
->>>>>>> 94c94b674d9036c52dd6cbd9f240a8c0d2d97525
+
 
             return CommentsViewModdel;
         }

@@ -140,9 +140,11 @@ a {
     color: #0056b3;
     text-decoration: underline; }
 
-a:not([href]):not([tabindex]) {
-  color: inherit;
-  text-decoration: none; }
+    a:not([href]):not([tabindex]) {
+        color: green;
+        text-decoration: none;
+        right: 78px;
+    }
   a:not([href]):not([tabindex]):hover, a:not([href]):not([tabindex]):focus {
     color: inherit;
     text-decoration: none; }
@@ -7889,8 +7891,9 @@ h1, h2, h3, h4, h5,
     -webkit-transition: all 0.3s;
     -o-transition: all 0.3s;
     transition: all 0.3s;
-    margin-left: -203px;
-    margin-top: 53px;
+    margin-left: -206px;
+    margin-top: 35px;
+    border-style: revert;
 }
     #sidebar.active {
         margin-left: -100px;

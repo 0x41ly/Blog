@@ -22,12 +22,12 @@
 	        </ul>
 	      </div>
     	</nav>
- @{
-    Html.RenderPartial("../Shared/_StatusMessage", (string)(TempData["Message"])); 
-   }
+
         <!-- Page Content  -->
       <div id="content" class="p-4 p-md-5" style="position: relative;top: 31px;">
-
+          @{
+         Html.RenderPartial("../Shared/_StatusMessage", (string)(TempData["Message"])); 
+          }
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
           <div class="container-fluid">
 
@@ -70,7 +70,7 @@
                 </svg>
               <i class="bi bi-tag-fill"><a class="btn btn-link" onclick="document.getElementById('Genre-form').submit();">@Html.DisplayFor(model => model.Article.Categories)</a></i></div>
               <div class="Createcomment-div">
-               @{ await Html.RenderPartialAsync("_CreateComment", new Comment {ArticleId=Model.Article.ArticleId ,ParentId=null }); }
+               @{ await Html.RenderPartialAsync("_CreateComment", new Comment {ArticleId=Model.Article.ArticleId ,ParentId=Guid.Empty }); }
             </div>
       @*</div style="position: relative;top: 102px;">*@
 <!--###########################icon##########################-->
