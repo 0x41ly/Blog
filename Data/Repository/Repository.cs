@@ -373,11 +373,12 @@ namespace Blog.Data.Repository
             commentViewModel.Comment = comment;
             commentViewModel.Creator = GetUserProfile(comment.AuthorId);
             commentViewModel.CommentLikes = GetCommentLikes(comment.CommentId);
+            commentViewModel.SubComments = new List<CommentViewModel>();
             if (comment.level < 3)
             {
                 foreach (var nextlevelcomment in nextLevelComments)
                 {
-                    commentViewModel.SubComments = new List<CommentViewModel>();
+                    
                     commentViewModel.SubComments.Add(commentToViewComment(nextlevelcomment, comments.Except(nextLevelComments).ToList()));
                 }
             }
