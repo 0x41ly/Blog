@@ -15,7 +15,7 @@ namespace Blog.Data.Repository
         bool UpdateArticle(Article article);
         void RemoveArticle(Guid id);
         void RemoveComment(Guid id);
-        bool AddComment(Comment comment);
+        string AddComment(Comment comment);
         bool AddView(Guid ArticleId, string UserId);
         bool AddArticleLike(Guid ArticleId, string UserId);
         bool AddCommentLike(Guid CommentId, string UserId);
