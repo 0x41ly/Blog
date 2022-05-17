@@ -356,6 +356,7 @@ namespace Blog.Data.Repository
         {
             var CommentsViewModdel = new List<CommentViewModel>();
             var comments = _ctx.Comments
+                .Where(a => a.ArticleId == id)
                 .ToList();
             var level0Comments = comments.Where(c => c.level == 0);
             foreach (var comment in level0Comments)
@@ -494,7 +495,7 @@ namespace Blog.Data.Repository
             return false;
         }
 
-        public Comment? GetComment(Guid commentId)
+        private Comment? GetComment(Guid commentId)
         {
             return _ctx.Comments
                 .FirstOrDefault(e => e.CommentId == commentId);
