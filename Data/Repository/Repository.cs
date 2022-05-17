@@ -377,6 +377,7 @@ namespace Blog.Data.Repository
             {
                 foreach (var nextlevelcomment in nextLevelComments)
                 {
+                    commentViewModel.SubComments = new List<CommentViewModel>();
                     commentViewModel.SubComments.Add(commentToViewComment(nextlevelcomment, comments.Except(nextLevelComments).ToList()));
                 }
             }
