@@ -72,6 +72,12 @@
               <div class="Createcomment-div">
                @{ await Html.RenderPartialAsync("_CreateComment", new Comment {ArticleId=Model.Article.ArticleId ,ParentId=Guid.Empty }); }
             </div>
+        @{
+            foreach (var maincommentview in Model.MainComments)
+            {
+                <partial name="_CommentView" model="maincommentview"/>
+            }
+        }
       @*</div style="position: relative;top: 102px;">*@
 <!--###########################icon##########################-->
       @* <div class="container" style="position: relative;top: 60px;r;/* right: 68px; */">

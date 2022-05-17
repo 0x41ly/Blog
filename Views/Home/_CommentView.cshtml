@@ -4,8 +4,7 @@
 
 @{
 
-    foreach (var commentview in Model.SubComments)
-    {
+
         <div class="child-comment">
             <div class="profile-column">
                 <i class="fas fa-user"></i>
@@ -16,26 +15,32 @@
             <div class="parent-comment-contents">
 
                 <div class="user-info">
-                    <p class="">@Html.DisplayFor(modelItem => commentview.Creator.UserName)</p>
+                    <p class="">@Model.Creator.UserName</p>
                     <p>&#8226;</p>
-                    <p>@Html.DisplayFor(modelItem => commentview.Comment.Created)</p>
+                    <p>@Model.Comment.Created</p>
                 </div>
                 <div>
-                    <p id='slackbot-comment'>@Html.DisplayFor(modelItem => commentview.Comment.Message)</p>
+                    <p id='slackbot-comment'>@Model.Comment.Message</p>
                 </div>
                 <div class="rounded-circle">
-                    @if (commentview.Creator.ProfilePicture != null)
+                    @if (Model.Creator.ProfilePicture != null)
                         {
-                            <img id="profilePicture" src="data:image/*;base64,@(Convert.ToBase64String(commentview.Creator.ProfilePicture))">
+                            <img id="profilePicture" src="data:image/*;base64,@(Convert.ToBase64String(Model.Creator.ProfilePicture))">
                         }
                         else
                         {
                             <img id="profilePicture"  src="~/Images/Avatars/Default.png">
                        }
                 </div> 
+            @{
+                foreach (var subcommentview in Model.SubComments)
+                {
+                    <partial name="_CommentView" model="subcommentview"/>
+                }
+            }
             </div>
         </div>
 
-    }
+    
 }
   <link rel="stylesheet" href="~/Blog.styles.css" asp-append-version="true" />
