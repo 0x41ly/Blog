@@ -235,6 +235,7 @@ public class HomeController : Controller
         if (_repo.AddArticleLike(ArticleId, UserId))
         {
             await _repo.SaveChangesAsync();
+            TempData["Message"] = "success: Successfully like";
             return RedirectToAction("Article", new { id = ArticleId });
         }
         TempData["Message"] = "warning: The article you are trying to like is not exist";
@@ -393,6 +394,7 @@ public class HomeController : Controller
         if (_repo.Recommend(ArticleId, UserId))
         {
             await _repo.SaveChangesAsync();
+            TempData["Message"] = "success: Successfully Recommend ";
             return RedirectToAction("Article", new { id = ArticleId });
         }
 

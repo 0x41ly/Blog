@@ -1,0 +1,47 @@
+﻿@using Blog.ViewModels
+@model ArticleViewModel
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+<div class="container">
+        <!--###########################Pin##########################-->
+          <form id="Article-form" asp-controller="Home" asp-action="ArticlePin" method="post" style="position: relative;top:38px;right: -4px;">
+              <input type="hidden" name="ArticleId" value="@Model.Article.ArticleId" />
+                <button class="btn btn-danger" type="submit" data-toggle="tooltip" data-placement="down" title="Pin">
+                    <i class="fa fa-thumb-tack" aria-hidden="true"></i>
+                </button>
+        </form>
+          <!--########################### End Pin##########################-->
+          <!--###########################Like##########################-->        
+        <form id="Article-form" asp-controller="Home" asp-action="ArticleLike" method="post" style="position: relative;right: -46px;">
+              <input type="hidden" name="ArticleId" value="@Model.Article.ArticleId" />
+                    <button class="btn btn-danger" type="submit" data-toggle="tooltip" data-placement="down" title="Like">
+                    <i class="fa fa-thumbs-o-up" aria-hidden="true"></i>
+                </button>
+               
+        </form>
+          <!--########################### End Like##########################-->
+          <!--###########################Edit##########################-->
+        <a class="btn btn-danger" type="submit" asp-controller=Home asp-action=UpdateArticle asp-route-id="@Model.Article.ArticleId" data-toggle="tooltip" data-placement="down" title="Edit Post" style="position: relative;right: 44px;top: -37px;">
+            <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+        </a>
+           <!--########################### End Edit##########################-->
+           <!--###########################Remove##########################-->
+           <form id="Article-form" asp-controller="Home" asp-action="RemoveArticle" method="post" >
+                <input type="hidden" name="id" value="@Model.Article.ArticleId" />
+                <button type="submit" class="btn btn-danger" data-toggle="tooltip" data-placement="down" title="Remove Post"style="position: relative;right: 141px;top: -75px;">
+                    <i class="fa fa-trash-o" aria-hidden="true"></i>
+                </button>
+           </form>
+        <!--###########################Recommend##########################-->
+        <form id="Article-form" asp-controller="Home" asp-action="Recommend" method="post" style="position: relative;right: 93px;top: -113px;width: 39px">
+            <input type="hidden" name="ArticleId" value="@Model.Article.ArticleId" />
+            <button class="btn btn-danger" type="submit" data-toggle="tooltip" data-placement="down" title="Recommend">
+                <i class="fa fa-check-square-o" aria-hidden="true"></i>
+            </button>
+        </form>
+        <!--########################### End Recommend##########################-->
+                
+</div>
+}

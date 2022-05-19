@@ -136,7 +136,8 @@
                         <ul>
                             @foreach (var category in Model.CategoriesCount)
                             {
-                                  <li><a href="#">@category.Category (@category.Count)</a></li>
+                                  <li><a asp-action="Index" asp-controller="Home" asp-route-category="@Model.Category"
+                              asp-route-search="@Model.Search">@category.Category (@category.Count)</a></li>
                             }
 
                 

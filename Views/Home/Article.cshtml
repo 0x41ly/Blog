@@ -45,10 +45,16 @@
                 <path d="M2 1a1 1 0 0 0-1 1v4.586a1 1 0 0 0 .293.707l7 7a1 1 0 0 0 1.414 0l4.586-4.586a1 1 0 0 0 0-1.414l-7-7A1 1 0 0 0 6.586 1H2zm4 3.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
                 </svg>
               <i class="bi bi-tag-fill"><a class="btn btn-link" onclick="document.getElementById('Genre-form').submit();">@Html.DisplayFor(model => model.Article.Categories)</a></i></div>
-              <div class="Createcomment-div">
+              <div class="contant" style="width: 886px;position: relative;top: -278px;right: -722px;">
+                @{
+                   await Html.RenderPartialAsync("_icon");
+                }
+            </div>
+              <div class="Createcomment-div" style="position: relative;top: -130px;">
                @{ await Html.RenderPartialAsync("_CreateComment", new Comment {ArticleId=Model.Article.ArticleId ,ParentId=Guid.Empty }); }
             </div>
-            <div class="contant" style="width: 886px;position: relative;top: 22px;">
+
+            <div class="contant" style="width: 886px;position: relative;top: -109px;">
                 @{
                     foreach (var maincommentview in Model.MainComments)
                     {
@@ -56,54 +62,8 @@
                     }
                 }
             </div>
-      @*</div style="position: relative;top: 102px;">*@
-<!--###########################icon##########################-->
-<div class="col-sm-6">
-</div>
-      @* <div class="container" style="position: relative;top: 60px;r;/* right: 68px; */">
-          <!--###########################Pin##########################-->
-          <form id="Article-form" asp-controller="Home" asp-action="ArticlePin" method="post" style="position: relative;top: 31px;right: -315px;width: 38px;">
-              <input type="hidden" name="ArticleId" value="@Model.Article.ArticleId" />
-          <button type="submit" class="btn btn-light"  data-toggle="tooltip" data-placement="down" title="Pin" style="position: relative;right: 1px;width: 34px;height: 46px;top: 7px;"></button></form>
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pen-fill" viewBox="0 0 16 16" style="position: relative;right: -320px;height: 27px;width: 24px;">
-            <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001z"/>
-          </svg>
-          
-          <!--########################### End Pin##########################-->
-          <!--###########################Like##########################-->
-          <form id="Article-form" asp-controller="Home" asp-action="ArticleLike" method="post" style="position: relative;right: -368px;width: 39px;height: 36px;top: -29px;">
-              <input type="hidden" name="ArticleId" value="@Model.Article.ArticleId" />
-          <button type="submit" class="btn btn-light" data-toggle="tooltip" data-placement="down" title="Like" style="position: relative;right: 5px;width: 34px;height: 46px;top: -3px;"></button></form>
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-hand-thumbs-up-fill" viewBox="0 0 16 16" style="height: 28px;width: 32px;position: relative;right: -364px;top: -68px;">
-             <path d="M6.956 1.745C7.021.81 7.908.087 8.864.325l.261.066c.463.116.874.456 1.012.965.22.816.533 2.511.062 4.51a9.84 9.84 0 0 1 .443-.051c.713-.065 1.669-.072 2.516.21.518.173.994.681 1.2 1.273.184.532.16 1.162-.234 1.733.058.119.103.242.138.363.077.27.113.567.113.856 0 .289-.036.586-.113.856-.039.135-.09.273-.16.404.169.387.107.819-.003 1.148a3.163 3.163 0 0 1-.488.901c.054.152.076.312.076.465 0 .305-.089.625-.253.912C13.1 15.522 12.437 16 11.5 16H8c-.605 0-1.07-.081-1.466-.218a4.82 4.82 0 0 1-.97-.484l-.048-.03c-.504-.307-.999-.609-2.068-.722C2.682 14.464 2 13.846 2 13V9c0-.85.685-1.432 1.357-1.615.849-.232 1.574-.787 2.132-1.41.56-.627.914-1.28 1.039-1.639.199-.575.356-1.539.428-2.59z"/>
-          </svg>
-          <!--########################### End Like##########################-->
-          <!--###########################Edit##########################-->
-          <a asp-controller=Home asp-action=UpdateArticle asp-route-id="@Model.Article.ArticleId" class="btn btn-light" role="button" aria-disabled="true" data-toggle="tooltip" data-placement="down" title="Edit Post" style="position: relative;right: -334px;width: 41px;height: 42px;" > </a>
-          @*<button type="button" class="btn btn-light" data-toggle="tooltip" data-placement="down" title="Edit Post" style="position: relative;right: -334px;width: 41px;height: 42px;"></button>*@
-        @* <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16" style="width: 74px;position: relative;right: -273px;height: 29px;">
-            <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
-            <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
-        </svg>
-        <!--########################### End Edit##########################-->
-        <!--###########################Remove##########################-->
-        <button type="button" class="btn btn-light" data-toggle="tooltip" data-placement="down" title="Remove Post" style="position: relative;right: -422px;width: 49px;height: 38px;top: -44px;"></button>
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16" style="position: relative;right: -381px;height: 41px;width: 25px;top: -44px;">
-            <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z"/>
-        </svg>        <!--###########################Recommed##########################-->
 
-        <button type="button" class="btn btn-light" data-toggle="tooltip" data-placement="down" title="Recommed Post" style="position: relative;right: -433px;width: 53px;height: 43px;top: -45px;"></button>
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-square-fill" viewBox="0 0 16 16" style="position: relative;right: -384px;width: 38px;height: 25px;top: -45px;">
-          <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm10.03 4.97a.75.75 0 0 1 .011 1.05l-3.992 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.75.75 0 0 1 1.08-.022z"/>
-        </svg>
-        <!--########################### End Recommed##########################-->*@
-        
-                @*<a class="btn btn-outline-primary" asp-controller="Home" asp-action="AddArticle" role="button">Create Post</a>*@
-            <!-- Button trigger modal -->
-<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter">
-  Delet
-</button>
-
+        </div>
 <!-- Modal -->
 <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
