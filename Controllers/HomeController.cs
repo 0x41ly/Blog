@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Blog.Models;
 using Blog.Data.FileManager;
@@ -235,7 +235,7 @@ public class HomeController : Controller
         if (_repo.AddArticleLike(ArticleId, UserId))
         {
             await _repo.SaveChangesAsync();
-            TempData["Message"] = "success: Successfully like";
+           
             return RedirectToAction("Article", new { id = ArticleId });
         }
         TempData["Message"] = "warning: The article you are trying to like is not exist";
@@ -394,7 +394,6 @@ public class HomeController : Controller
         if (_repo.Recommend(ArticleId, UserId))
         {
             await _repo.SaveChangesAsync();
-            TempData["Message"] = "success: Successfully Recommend ";
             return RedirectToAction("Article", new { id = ArticleId });
         }
 
