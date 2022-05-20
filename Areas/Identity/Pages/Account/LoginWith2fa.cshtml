@@ -3,7 +3,10 @@
 @{
     ViewData["Title"] = "Two-factor authentication";
 }
+<style>
+      
 
+</style>
 <h1>@ViewData["Title"]</h1>
 <hr />
 <p>Your login is protected with an authenticator app. Enter your authenticator code below.</p>
@@ -17,6 +20,7 @@
                 <label asp-for="Input.TwoFactorCode" class="form-label"></label>
                 <span asp-validation-for="Input.TwoFactorCode" class="text-danger"></span>
             </div>
+
             <div>
                 <div class="checkbox">
                     <label asp-for="Input.RememberMachine" class="form-label">
@@ -30,6 +34,7 @@
             </div>
         </form>
     </div>
+       
 </div>
 <p>
     Don't have access to your authenticator device? You can
