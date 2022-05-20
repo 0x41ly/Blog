@@ -1,0 +1,63 @@
+﻿@using Blog.ViewModels
+@model CommentViewModel
+@{
+<div class=container  style="position: relative;right: 63px;top: -6px;">
+              <div class="d-flex flex-start mb-4">
+                <div class="rounded-circle">
+                    @if (Model.Creator.ProfilePicture != null)
+                        {
+                            <img class="rounded-circle shadow-1-strong me-3" src="data:image/*;base64,@(Convert.ToBase64String(Model.Creator.ProfilePicture))" alt="avatar" width="65" height="65">
+                        }
+                        else
+                        {
+                            <img class="rounded-circle shadow-1-strong me-3" src="~/Images/Avatars/Default.png" alt="avatar" width="50" height="50">
+                        }
+                </div>   
+                <div class="card w-100">
+                    <i data-toggle="modal" data-target="#exampleModalCenter" class="fa fa-times-rectangle"aria-hidden="true" style="position: relative;right: -760px;font-size: 25px;color: green;"></i>
+                        <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                              <div class="modal-dialog modal-dialog-centered" role="document">
+                                <div class="modal-content">
+                                  <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLongTitle">Are you sure??</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                      
+                                    </button>
+                                  </div>
+                                  <div class="modal-body">
+                                     <p>You are about to delete this Comment!!!!</p>
+                                  </div>
+                                  <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal"asp-controller="Home" asp-action="Article">Close</button>
+                                    <form method="post" asp-action="RemoveComment" asp-controller="Home">
+                                        <input type="hidden" name="id" value="@Model.Comment.CommentId"/>
+                                        <input type="submit" value="Delete" class="btn btn-primary btn-danger" /> 
+                                    </form>
+                                  </div>
+                                </div>
+                              </div>
+                        </div>                   
+                    <div class="card-body p-4">
+                    <div class="">                       
+                            <h5>@Model.Creator.UserName</h5>
+                            <p class="small"></p>
+                            <p>
+                                @Model.Comment.Created
+                            </p>
+                            <p >@Model.Comment.Message</p>
+                           
+                            <div class="parent-comment-contents">
+                                            @{
+                                                @foreach (var subcommentview in Model.SubComments)
+                                                {
+                                                    <partial name="_CommentView" model="subcommentview"/>
+                                                }
+                                                }
+                            </div>
+                    </div>
+                </div>
+                </div>
+            </div>
+</div>
+}
+    <link rel="stylesheet" href="~/Article/icon/css/font-awesome.min.css" asp-append-version="true" />

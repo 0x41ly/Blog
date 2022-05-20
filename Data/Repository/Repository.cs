@@ -2,7 +2,6 @@ using Blog.Areas.Identity.Data;
 using Blog.Models;
 using Blog.ViewModels;
 using Microsoft.EntityFrameworkCore;
-using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 
 
@@ -10,11 +9,11 @@ namespace Blog.Data.Repository
 {
     public class Repository : IRepository
     {
-        private BlogDbContext _ctx;
+        private static BlogDbContext _ctx;
         private readonly UserManager<BlogUser> _userManager;
 
         public Repository(BlogDbContext ctx,
-            IMapper mapper,
+            
             UserManager<BlogUser> userManager)
         {
             _ctx = ctx;
@@ -67,7 +66,7 @@ namespace Blog.Data.Repository
             int skipAmount = pageSize * (pageNumber - 1);
             
 
-            return new IndexViewModel
+            var indexViewModel = new IndexViewModel
             {
                 Genres = GetGenres(),
                 PageNumber = pageNumber,
@@ -78,20 +77,43 @@ namespace Blog.Data.Repository
                 Category = category,
                 Search = search,
                 RecommendedArticles = GetRecommenedArticles(),
-                Articles = (List<FrontArticleView>) query
-                    .Select(x => new FrontArticleView
-                    {
-                        Id = x.ArticleId,
-                        Title = x.Title,
-                        Description = x.Description
-                    })
-                    .Skip(articlesCount)
-                    .Take(pageSize)
-                    .ToList(),
+                
                 PinnedArticles = GetPinnedArticles(UserId),
                 CategoriesCount = GetCategoriesCount()
 
             };
+            if (query.ToList().Count() > pageSize )
+            {
+                indexViewModel.Articles = (List<FrontArticleView>)query
+                    .Select(x => new FrontArticleView
+                    {
+                        Id = x.ArticleId,
+                        Title = x.Title,
+                        Description = x.Description,
+                        CreatedDate = x.Created,
+                        CommentsCount = GetCommentsCount(x.ArticleId),
+                        userProfile = GetUserProfile(x.AuthorId)
+                    })
+                    .Skip(skipAmount)
+                    .Take(pageSize)
+                    .ToList();
+            }
+            else
+            {
+                indexViewModel.Articles = (List<FrontArticleView>)query
+                    .Select(x => new FrontArticleView
+                    {
+                        Id = x.ArticleId,
+                        Title = x.Title,
+                        Description = x.Description,
+                        CreatedDate = x.Created,
+                        CommentsCount = GetCommentsCount(x.ArticleId),
+                        userProfile = GetUserProfile(x.AuthorId)
+                    })
+                    .ToList();
+
+            }
+            return indexViewModel;
         }
 
         private List<CatagoryCountViewModel> GetCategoriesCount()
@@ -140,7 +162,7 @@ namespace Blog.Data.Repository
                                             .Where(x => x.UserId == UserId)
                                             .Select(i => new PinnedArticles {
                                                 ArticleId = i.ArticleId   
-                                            });
+                                            }).ToList();
                 foreach (var UserPinnedArticle in UserPinnedArticlesId)
                 {
                     UserPinnedArticles.Add(GetFrontArticleViewById(UserPinnedArticle.ArticleId));
@@ -170,7 +192,7 @@ namespace Blog.Data.Repository
             return RecommendedArticles;
         }
 
-        private FrontArticleView GetFrontArticleViewById(Guid articleId)
+        private static FrontArticleView GetFrontArticleViewById(Guid articleId)
         {
             return (FrontArticleView)_ctx.Articles
                 .Where(a => a.ArticleId == articleId)
@@ -178,17 +200,28 @@ namespace Blog.Data.Repository
                 {
                     Id = x.ArticleId,
                     Title = x.Title,
-                    Description = x.Description
-                });
+                    Description = x.Description,
+                    CreatedDate = x.Created,
+                    CommentsCount = GetCommentsCount(x.ArticleId),
+                    userProfile = GetUserProfile(x.AuthorId),
+                    ViewsCount = GetArticleViews(x.ArticleId),
+                    LikeCount = GetArticleLikes(x.ArticleId)
+                }).FirstOrDefault();
         }
 
-       
+        private static int GetCommentsCount(Guid articleId)
+        {
+            
+            int count = _ctx.Comments.Where(a => a.ArticleId == articleId).Count();
+            return count;
+        }
+
         private List<int> GetPageNumbers(int pageNumber, int pageCount)
         {
             var pageNumbers = new List<int>();
             if (pageCount < 10)
             {
-                for (int i = 0; i < pageCount; i++)
+                for (int i = 1; i <= pageCount; i++)
                 {
                     pageNumbers.Add(i);
                 }
@@ -250,17 +283,30 @@ namespace Blog.Data.Repository
             return false;
         }
 
-        public bool AddComment(Comment comment)
+        public string AddComment(Comment comment)
         {
-            if (GetComment(comment.CommentId) != null)
+            if (GetArticle(comment.ArticleId) != null)
             {
+                if (comment.ParentId == Guid.Empty)
+                {
+                    comment.level = 0;
+                }
+                else if(GetComment(comment.ParentId) != null )
+                {
+                    comment.level = GetCommentlevelByID(comment.ParentId) + 1;
+                    if (comment.level >= 3) { return "levelLemit"; }
+                }
+                else
+                {
+                    return "parentNotFound";
+                }
                 _ctx.Comments.Add(comment);
-                return true;
+                return "success";
             }
-            return false;
+            return "articleNotFound";
         }
 
-        public ArticleViewModel GetArticleViewModel(Guid id)
+        public ArticleViewModel GetArticleViewModel(Guid id, string UserId)
         {
             var ArticleViewModel = new ArticleViewModel();
             ArticleViewModel.Genres = GetGenres();
@@ -271,7 +317,11 @@ namespace Blog.Data.Repository
                 ArticleViewModel.ArticleViews = GetArticleViews(id);
                 ArticleViewModel.Author = GetUserProfile(ArticleViewModel.Article.AuthorId);
                 ArticleViewModel.SideBarArticles = GetSideBarArticles(ArticleViewModel.Article.GenreName);
-                ArticleViewModel.MainComments = GetComments(id, 0);
+
+                ArticleViewModel.MainComments = GetComments(id);
+
+                ArticleViewModel.isPinned = GetPinnedArticles(UserId).Any(a => a.Id == id);
+                ArticleViewModel.isLiked = _ctx.ArticleLikes.Any(a => a.Id == id & a.UserId ==UserId);
             }
             else
             {
@@ -280,7 +330,7 @@ namespace Blog.Data.Repository
             return ArticleViewModel;
         }
 
-        private int GetArticleViews(Guid id)
+        private static int GetArticleViews(Guid id)
         {
             return _ctx.Views
                     .Where(a => a.ArticleId == id).ToList().Count();
@@ -294,50 +344,78 @@ namespace Blog.Data.Repository
                 .ToList();
         }
 
-        private int GetArticleLikes(Guid id)
+        private static int GetArticleLikes(Guid id)
         {
             return _ctx.ArticleLikes
-                    .Where(a => a.ArticleId == id).ToList().Count();
+                    .Where(a => a.ArticleId == id).Count();
         }
         private int GetCommentLikes(Guid id)
         {
             return _ctx.CommentLikes
-                    .Where(a => a.CommentId == id).ToList().Count();
+                    .Where(a => a.CommentId == id).Count();
         }
-        private List<CommentViewModel>? GetComments(Guid id, int level)
+
+        
+
+        private List<CommentViewModel>? GetComments(Guid id)
+
         {
             var CommentsViewModdel = new List<CommentViewModel>();
+            Console.WriteLine(id);
             var comments = _ctx.Comments
-                .Where(c => c.ArticleId == id & c.level == level).ToList();
-            foreach (var comment in comments)
+
+
+ 
+
+                .Where(a => a.ArticleId == id)
+
+                .ToList();
+            
+            var level0Comments = comments.Where(c => c.level == 0);
+            foreach (var comment in level0Comments)
             {
-                CommentViewModel commentViewModel = new CommentViewModel();
-                commentViewModel.Comment = comment;
-                commentViewModel.Creator = GetUserProfile(comment.AuthorId);
-                commentViewModel.CommentLikes = GetCommentLikes(comment.CommentId);
-                if (comment.level < 3)
-                {
-                    commentViewModel.SubComments = GetComments(id, comment.level +1 );
-                }
-                CommentsViewModdel.Add(commentViewModel);
+                CommentsViewModdel.Add(commentToViewComment(comment, comments.Except(level0Comments).ToList()));
             }
+
 
             return CommentsViewModdel;
         }
+
+        private CommentViewModel commentToViewComment(Comment comment, List<Comment> comments)
+        {   
+            var nextLevelComments = comments.Where(c => c.level == comment.level + 1);
+            var commentViewModel = new CommentViewModel();
+            commentViewModel.Comment = comment;
+            commentViewModel.Creator = GetUserProfile(comment.AuthorId);
+            commentViewModel.CommentLikes = GetCommentLikes(comment.CommentId);
+            commentViewModel.SubComments = new List<CommentViewModel>();
+            if (comment.level < 3)
+            {
+                foreach (var nextlevelcomment in nextLevelComments)
+                {
+                    
+                    commentViewModel.SubComments.Add(commentToViewComment(nextlevelcomment, comments.Except(nextLevelComments).ToList()));
+                }
+            }
+            return commentViewModel;
+        }
+
         public Article? GetArticle(Guid id)
         {
             return _ctx.Articles
                         .Where(a => a.ArticleId == id)
                         .FirstOrDefault();
         }
-        private UserProfile GetUserProfile(string id)
+        private static UserProfile GetUserProfile(string id)
         {
             var user = _ctx.Users
                     .Where(u => u.Id == id)
                     .FirstOrDefault();
             UserProfile userProfile = new UserProfile
             {
-                AvatarPath = user.AvatarPath,
+                UserId = user.Id,
+                ProfilePicture = user.ProfilePicture ,
+                UserName = user.UserName ,
                 PlanType = user.PlanType,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
@@ -369,8 +447,9 @@ namespace Blog.Data.Repository
                 if (view == null)
                 {
                     _ctx.Views.Add(new View {Id = Guid.NewGuid() , ArticleId = ArticleId, UserId = UserId });
+                    return true;
                 }
-                return true;
+                
             }
             return false;
         }
@@ -391,12 +470,14 @@ namespace Blog.Data.Repository
                         UserId = UserId
                     };
                     _ctx.ArticleLikes.Add(ArticleLike);
+                    return true;
                 }
                 else
                 {
                     _ctx.ArticleLikes.Remove(ArticleLike);
+                    return true;
                 }
-                return true;
+                
             }
             return false;
         }
@@ -416,12 +497,14 @@ namespace Blog.Data.Repository
                         CommentId = CommentId,
                         UserId = UserId };
                     _ctx.CommentLikes.Add(CommentLike);
+                    return true;
                 }
                 else
                 {
                     _ctx.CommentLikes.Remove(CommentLike);
+                    return true;
                 }
-                return true;
+                
             }
             return false;
         }
@@ -436,22 +519,21 @@ namespace Blog.Data.Repository
         {
             var MonthlyPostedArticles = _ctx.Articles
                                             .Where(a => a.AuthorId == UserId & a.Created.ToString("MM/yyyy") == DateTime.Now.ToString("MM/yyyy"))
-                                            .ToList()
                                             .Count();
             return MonthlyPostedArticles < 2;
             
         }
 
-        public ArticleViewModel GetFirstArticleByGenre(string Genre)
+        public Guid? GetFirstArticleIdByGenre(string Genre)
         {
             var article = _ctx.Articles
                 .Where(a => a.GenreName == Genre)
                 .OrderBy(a => a.Created)
                 .ToList()[0];
-            return GetArticleViewModel(article.ArticleId);
+            return article.ArticleId;
         }
 
-        public int GetCommentlevelByID(Guid id)
+        private int GetCommentlevelByID(Guid id)
         {
             var level = _ctx.Comments
                 .Where(c => c.CommentId == id)
@@ -467,7 +549,194 @@ namespace Blog.Data.Repository
 
         public void RemoveComment(Guid id)
         {
+            var subcomments = _ctx.Comments.Where(c => c.ParentId == id).ToList();
             _ctx.Comments.Remove(GetComment(id));
+            foreach(var subcomment in subcomments)
+            {
+                _ctx.Comments.Remove(subcomment);
+            }
         }
+
+        public bool Recommend(Guid ArticleId, string UserId)
+        {
+            var recommendedBy = _ctx.RecommendedBy
+                 .Where(e => e.ArticleId == ArticleId & e.UserId == UserId)
+                 .FirstOrDefault(); ;
+            if (recommendedBy == null)
+            {
+                recommendedBy = new RecommendedBy
+                {
+                    Id = Guid.NewGuid(),
+                    ArticleId = ArticleId,
+                    UserId = UserId
+
+                };
+                _ctx.RecommendedBy.Add(recommendedBy);
+                return true;
+            }
+            else
+            {
+                _ctx.RecommendedBy.Remove(recommendedBy);
+            }
+            return false;
+        }
+
+        public AdminViewModel AdminViewModel(string UserId)
+        {
+
+            var AdminViewModel =  new AdminViewModel {
+                UsersCount = GetUsersCount(),
+                ArticleCount = GetArticleCount(),
+                MostInteractionsArticleViewModel = GetMostLikedArticles(),
+                userProfile = GetUserProfile(UserId),
+                UserRequestedPremium = GetUserRequestedPremium()
+            };
+            return AdminViewModel;
+        }
+
+        private List<UserProfile> GetUserRequestedPremium()
+        {
+            return (List<UserProfile>)_ctx.Users
+                .Where(a => a.RequestedPremium)
+                .Select(user => new UserProfile
+                {
+                    UserId = user.Id,
+                    ProfilePicture = user.ProfilePicture,
+                    UserName = user.UserName,
+                    PlanType = user.PlanType,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    Email = user.Email,
+                    Gender = user.Gender,
+                    DOB = user.DOB
+                });
+
+            
+        }
+
+        public bool RequestPremium(string UserId)
+        {
+            var user = _ctx.Users
+                .Where(u => u.Id == UserId)
+                .FirstOrDefault();
+            if (user != null)
+            {
+                user.RequestedPremium = true;
+                _ctx.Users.Update(user);
+                return true;
+            }
+            return false;   
+            
+                
+
+         
+        }
+
+        public bool GivePremium(string UserId)
+        {
+            var user = _ctx.Users
+                .Where(u => u.Id == UserId)
+                .FirstOrDefault();
+            if (user != null)
+            {
+                user.PlanType = "Premium";
+                user.RequestedPremium = false;
+                _ctx.Users.Update(user);
+                
+                return true;
+            }
+            return false;
+        }
+
+        public bool RemoveUser(string UserId)
+        {
+            var user = _ctx.Users
+                .Where(u => u.Id == UserId)
+                .FirstOrDefault();
+            if (user != null)
+            {
+                _ctx.Users.Remove(user);
+                return true;
+            }
+            return false;
+        }
+
+        public string LocalPin(string UserId, Guid ArticleId)
+        {
+
+            if (GetArticle(ArticleId) != null)
+            {
+                var ArticlePin = _ctx.PinnedArticles
+                    .Where(e => e.ArticleId == ArticleId & e.UserId == UserId)
+                    .FirstOrDefault();
+                if (ArticlePin == null)
+                {
+                    ArticlePin = new PinnedArticles
+                    {
+                        Id = Guid.NewGuid(),
+                        ArticleId = ArticleId,
+                        UserId = UserId
+                    };
+                    _ctx.PinnedArticles.Add(ArticlePin);
+                    return "Added";
+                }
+                else
+                {
+                    _ctx.PinnedArticles.Remove(ArticlePin);
+                    return "Removed";
+                }
+
+            }
+            return "Error"; 
+        }
+
+        public string GlobalPin(Guid ArticleId)
+        {
+            var article = GetArticle(ArticleId);
+            if (article != null)
+            {
+                article.Pinned = !article.Pinned;
+                _ctx.Articles.Update(article);
+                return article.Pinned ? "Adderd" :"Removed";
+            }
+            return "Error";
+        }
+
+        private int GetUsersCount()
+        {
+            return _ctx.Users.Count();
+        }
+
+        private int GetArticleCount()
+        {
+            return _ctx.ArticleLikes.Count();
+        }
+
+        private MostInteractionsArticleViewModel GetMostLikedArticles()
+        {
+            var ArticlesId = _ctx.Articles
+                .Select(a => a.ArticleId).ToList();
+            var Articles = new List<FrontArticleView>();
+            foreach (var ArticleId in ArticlesId)
+            {
+                Articles.Add(GetFrontArticleViewById(ArticleId));
+            }
+            var MostInteractions = new MostInteractionsArticleViewModel
+            {
+                MostLikedArticles = Articles
+                .OrderByDescending(a => a.LikeCount)
+                .Take(3),
+                MostCommentedArticles = Articles
+                .OrderByDescending(a => a.CommentsCount)
+                .Take(3),
+                MostViewedArticles = Articles
+                .OrderByDescending(a => a.ViewsCount)
+                .Take(3)
+            };
+
+            return MostInteractions;
+
+        }
+
     }
 }

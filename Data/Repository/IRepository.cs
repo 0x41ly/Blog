@@ -9,22 +9,31 @@ namespace Blog.Data.Repository
     {
 
         
-        ArticleViewModel GetArticleViewModel(Guid id);
+        ArticleViewModel GetArticleViewModel(Guid id, string UserId);
         IndexViewModel GetIndexViewModel(int pageNumber, string category, string search, string UserId);
         void AddArticle(Article article);
         bool UpdateArticle(Article article);
         void RemoveArticle(Guid id);
         void RemoveComment(Guid id);
-        bool AddComment(Comment comment);
+        string AddComment(Comment comment);
         bool AddView(Guid ArticleId, string UserId);
         bool AddArticleLike(Guid ArticleId, string UserId);
         bool AddCommentLike(Guid CommentId, string UserId);
         bool IsAllowedToPost(string UserId);
-        ArticleViewModel GetFirstArticleByGenre(string Genre);
+        Guid? GetFirstArticleIdByGenre(string Genre);
         Guid GetArticleId(Guid CommentId);
         Task<bool> SaveChangesAsync();
-        int GetCommentlevelByID(Guid id);
+
         Article? GetArticle(Guid id);
+
+        bool Recommend(Guid ArticleId, string UserId);
+        AdminViewModel AdminViewModel(string UserId);
+        bool RequestPremium(string UserId);
+        bool GivePremium(string UserId);
+
+        bool RemoveUser(string UserId);
+        string LocalPin(string UserId, Guid ArticleId);
+        string GlobalPin(Guid ArticleId);
         public Comment? GetComment(Guid commentId);
     }
 }

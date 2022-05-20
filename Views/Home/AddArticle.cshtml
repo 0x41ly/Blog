@@ -1,0 +1,71 @@
+﻿@model Blog.Models.Article
+
+@{
+    ViewData["Title"] = "Create Post";
+}
+@{
+    Html.RenderPartial("../Shared/_StatusMessage", (string)(TempData["Message"])); 
+}
+
+<div class="container">
+	<div class="row">
+	    
+	    <div class="col-md-8 col-md-offset-2">
+	        
+    		<h1>Create post</h1>
+    		
+    		<form asp-action="AddArticle" method="POST">
+    		    <div class="form-group">
+    		        <label for="Genre">Genre Name <span asp-validation-for="GenreName"class="require" >*</span></label>
+    		        <input asp-for="GenreName"id=genre class="form-control" type="text" aria-required="true"/>
+                    <span asp-validation-for="GenreName" class="text-danger"></span>
+    		    </div>
+    		    <div class="form-group has-error">
+    		        <label for="Title">Title <span  asp-validation-for="Title" class="require">*</span> </label>
+    		        <input asp-for="Title" type="text" aria-required="true" class="form-control" name="Title" />
+    		    </div>
+                
+                <label for="Level">Level<span  asp-validation-for="Level" class="require">*</span></label>
+              
+    		     <div class="form-floating" >
+                    
+                    <select  asp-for="Level" class="btn  btn-outline border-dark dropdown-toggle"  aria-required="true" >
+                        <option value="beginner" selected>beginner</option>
+                        <option value="intermediate">intermediate</option>
+                        <option value="advanced">advanced</option>
+                    </select>
+                  </div>
+               
+                <div class="form-group">
+                    <label for="description">Description <span asp-validation-for="Description" class="require">*</span></label>
+                    <textarea asp-for="Description" class="form-control" aria-required="true"></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+    		    <div class="form-group"id=Categor>
+    		        <label for="Categories"style="position: relative;top: 25px;">Categories <span asp-validation-for="Categories" class="require">*</span></label>
+    		        <input asp-for="Categories"id=genre class="form-control"name="Categories" type="text" placeholder="comma separated"aria-required="true" style="position: relative;top: 25px;right: -3px;height: 34px;width: 654px;"/>
+                    <span asp-validation-for="Categories" class="text-danger"></span>
+    		    </div>
+    		    
+                
+    		    <div class="form-group"id="content">
+    		        <label for="Content">Content<span asp-validation-for="Content" class="require">*</span></label>
+    		        <textarea asp-for="Content" rows="5" class="form-control" name="Content" style="height: 406px;" ></textarea>
+                    <span asp-validation-for="Content" class="text-danger"></span>
+    		    </div>
+    		    
+    		    <div class="form-group">
+    		        <button type="submit" class="btn btn-primary" style="position: relative;top: -16px;">
+    		            Create
+    		        </button>
+    		        <button class="btn btn-default" asp-controller=Home asp-action=index style="position: relative;top: -16px;">
+    		            Cancel
+    		        </button>
+    		    </div>
+    		    
+    		</form>
+		</div>
+		
+	</div>
+</div>
+<link href="~/HomeStyle/assets/css/Blog.css" rel="stylesheet" asp-append-version="true">

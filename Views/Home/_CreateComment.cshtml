@@ -1,0 +1,22 @@
+﻿@using Blog.ViewModels
+@model Blog.Models.Comment
+
+<div class="commentsize">
+     <form asp-action="Comment" asp-controller="Home" method="post">
+        <input asp-for="ArticleId" type="hidden" value="@Model.ArticleId"/>
+        <input asp-for="ParentId" type="hidden" value="@Model.ParentId"/>
+    
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="Message">
+            <input asp-for="Message" type="text" aria-required="true"  placeholder="Type a comment......." class="Createcomment" />
+            
+            <span asp-validation-for="Message" class="text-danger"></span>
+        </div>
+        <div class="buttonComment">
+            <input asp-for="Message" type="submit" value="Comment"  />
+        </div>
+        @*<input type="submit" style="display:none"/>*@
+    </form>
+</div>
+<link rel="stylesheet" href="~/Article/css/comment.css"asp-append-version="true" />
+

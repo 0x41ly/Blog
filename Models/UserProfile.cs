@@ -1,9 +1,10 @@
 namespace Blog.Models;
 public class UserProfile
 {
-    public String? AvatarPath { get; set; }
+    public string UserId { get; set; }
+    public byte[]? ProfilePicture { get; set; }
 
-
+    public string  UserName { get; set; }
     public String PlanType { get; set; }
 
     public String FirstName { get; set; }

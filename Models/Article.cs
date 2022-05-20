@@ -34,8 +34,8 @@ namespace Blog.Models
         public bool Recommended { get; set; }
         [MaxLength(450)]
         public String AuthorId { get; set; }
-        
 
+        [ForeignKey("AuthorId")]
         public virtual BlogUser Author { get; set; }
         
         public virtual ICollection<Comment>? MainComments { get; set; }

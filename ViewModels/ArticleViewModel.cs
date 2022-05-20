@@ -1,4 +1,4 @@
-﻿using Blog.Areas.Identity.Data;
+﻿
 using Blog.Models;
 
 namespace Blog.ViewModels
@@ -13,5 +13,7 @@ namespace Blog.ViewModels
         public List<FrontArticleView> SideBarArticles { get; set; }
         public List<CommentViewModel>? MainComments { get; set; }
         public bool NotFound { get; set; }
+        public bool isPinned { get; set; }
+        public bool isLiked { get; set; }
     }
 }

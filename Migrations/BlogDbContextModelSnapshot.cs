@@ -30,9 +30,6 @@ namespace Blog.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
-                    b.Property<string>("AvatarPath")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
@@ -88,6 +85,12 @@ namespace Blog.Migrations
                     b.Property<string>("PlanType")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<byte[]>("ProfilePicture")
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<bool>("RequestedPremium")
+                        .HasColumnType("bit");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
@@ -210,9 +213,6 @@ namespace Blog.Migrations
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("CreatorId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<string>("Message")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -227,7 +227,7 @@ namespace Blog.Migrations
 
                     b.HasIndex("ArticleId");
 
-                    b.HasIndex("CreatorId");
+                    b.HasIndex("AuthorId");
 
                     b.HasIndex("ParentId");
 
@@ -491,7 +491,9 @@ namespace Blog.Migrations
 
                     b.HasOne("Blog.Areas.Identity.Data.BlogUser", "Creator")
                         .WithMany()
-                        .HasForeignKey("CreatorId");
+                        .HasForeignKey("AuthorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Blog.Models.Comment", null)
                         .WithMany("SubComments")

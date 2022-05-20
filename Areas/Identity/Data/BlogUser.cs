@@ -5,8 +5,7 @@ namespace Blog.Areas.Identity.Data
 {
     public class BlogUser : IdentityUser
     {
-        [PersonalData]
-        public String? AvatarPath { get; set; }
+
 
         [PersonalData]
         public String PlanType { get; set; }
@@ -26,6 +25,9 @@ namespace Blog.Areas.Identity.Data
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd,hh:mm tt}", ApplyFormatInEditMode = true)]
         public DateTime LastSeen { get; set; }
+        public byte[]? ProfilePicture { get; set; }
+
+        public bool RequestedPremium { get; set; }
 
 
 
