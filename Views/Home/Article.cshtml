@@ -6,174 +6,89 @@
     ViewData["Title"] = "Details";
 }
 
-<partial name="_Genres"  model="Model.Genres"/>
-<div class="wrapper d-flex align-items-stretch">
-			<nav id="sidebar">
-				<div class="p-4 pt-5">
-	        <ul class="list-unstyled components mb-5">
-	          <li class="active">
-	          <li>
-                  @foreach (var title in Model.SideBarArticles)
-                  {
-                      <a asp-controller=Home asp-action=Article data-toggle="tooltip" data-placement="down" title="@title.Description" >@title.Title</a>
+    <partial name="_Genres"  model="Model.Genres"/>
+    <div class="wrapper d-flex align-items-stretch">
+			    <nav id="sidebar">
+				    <div class="p-4 pt-5">
+	            <ul class="list-unstyled components mb-5">
+	              <li class="active">
+	              <li>
+                      @foreach (var title in Model.SideBarArticles)
+                      {
+                          <a asp-controller=Home asp-action=Article data-toggle="tooltip" data-placement="down" title="@title.Description" >@title.Title</a>
+                      }
+              
+	              </li>
+	            </ul>
+	          </div>
+    	    </nav>
+
+            <!-- Page Content  -->
+          <div id="content" class="p-4 p-md-5" style="position: relative;top: 31px;">
+                  @{
+                 Html.RenderPartial("../Shared/_StatusMessage", (string)(TempData["Message"])); 
                   }
-              
-	          </li>
-	        </ul>
-	      </div>
-    	</nav>
-
-        <!-- Page Content  -->
-      <div id="content" class="p-4 p-md-5" style="position: relative;top: 31px;">
-              @{
-             Html.RenderPartial("../Shared/_StatusMessage", (string)(TempData["Message"])); 
-              }
 
 
-       <h2 class="mb-4">@Html.DisplayFor(model => model.Article.Title)</h2>
-        <ul><li style="list-style:none;margin-left: -30px;margin-top: -15px;"><span class="strong" style="color:var(--gfg-color-lg);font-family:var(--font-sofia);font-size:15px">Last Updated :</span>
-            <span style="color:var(--gfg-color-lg);font-family:var(--font-sofia);font-size:15px">@Html.DisplayFor(model => model.Article.LastUpdated)</span><p></p>
-            </li>
-        </ul>  
-        <ul><li style="list-style:none;margin-left: -30px;margin-top: -15px;"><span class="strong" style="color:var(--gfg-color-lg);font-family:var(--font-sofia);font-size:15px">Genre Name :</span>
-            <span style="color:var(--gfg-color-lg);font-family:var(--font-sofia);font-size:15px">@Html.DisplayFor(model => model.Article.GenreName)</span><p></p>
-            </li>
-        </ul> 
-        <p>@Html.DisplayFor(model => model.Article.Description)</p>
-        <p>@Html.DisplayFor(model => model.Article.Content)</p>
-        <div> <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-tag-fill" viewBox="0 0 16 16">
-                <path d="M2 1a1 1 0 0 0-1 1v4.586a1 1 0 0 0 .293.707l7 7a1 1 0 0 0 1.414 0l4.586-4.586a1 1 0 0 0 0-1.414l-7-7A1 1 0 0 0 6.586 1H2zm4 3.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
-                </svg>
-              <i class="bi bi-tag-fill"><a class="btn btn-link" onclick="document.getElementById('Genre-form').submit();">@Html.DisplayFor(model => model.Article.Categories)</a></i></div>
-              <div class="contant" style="width: 886px;position: relative;top: -278px;right: -722px;">
-                @{
-                   await Html.RenderPartialAsync("_icon");
-                }
-            </div>
-              <div class="Createcomment-div" style="position: relative;top: -130px;">
-               @{ await Html.RenderPartialAsync("_CreateComment", new Comment {ArticleId=Model.Article.ArticleId ,ParentId=Guid.Empty }); }
-            </div>
-
-            <div class="contant" style="width: 886px;position: relative;top: -109px;">
-                @{
-                    foreach (var maincommentview in Model.MainComments)
-                    {
-                        <partial name="_CommentView" model="maincommentview"/>
+           <h2 class="mb-4">@Html.DisplayFor(model => model.Article.Title)</h2>
+            <ul><li style="list-style:none;margin-left: -30px;margin-top: -15px;"><span class="strong" style="color:var(--gfg-color-lg);font-family:var(--font-sofia);font-size:15px">Last Updated :</span>
+                <span style="color:var(--gfg-color-lg);font-family:var(--font-sofia);font-size:15px">@Html.DisplayFor(model => model.Article.LastUpdated)</span><p></p>
+                </li>
+            </ul>  
+            <ul><li style="list-style:none;margin-left: -30px;margin-top: -15px;"><span class="strong" style="color:var(--gfg-color-lg);font-family:var(--font-sofia);font-size:15px">Genre Name :</span>
+                <span style="color:var(--gfg-color-lg);font-family:var(--font-sofia);font-size:15px">@Html.DisplayFor(model => model.Article.GenreName)</span><p></p>
+                </li>
+            </ul> 
+            <p>@Html.DisplayFor(model => model.Article.Description)</p>
+            <p>@Html.DisplayFor(model => model.Article.Content)</p>
+            <div> <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-tag-fill" viewBox="0 0 16 16">
+                    <path d="M2 1a1 1 0 0 0-1 1v4.586a1 1 0 0 0 .293.707l7 7a1 1 0 0 0 1.414 0l4.586-4.586a1 1 0 0 0 0-1.414l-7-7A1 1 0 0 0 6.586 1H2zm4 3.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
+                    </svg>
+                  <i class="bi bi-tag-fill"><a class="btn btn-link" onclick="document.getElementById('Genre-form').submit();">@Html.DisplayFor(model => model.Article.Categories)</a></i></div>
+                  <div class="contant" style="width: 886px;position: relative;top: -278px;right: -722px;">
+                    @{
+                       await Html.RenderPartialAsync("_icon");
                     }
-                }
-            </div>
+                </div>
+                  <div class="Createcomment-div" style="position: relative;top: -130px;">
+                   @{ await Html.RenderPartialAsync("_CreateComment", new Comment {ArticleId=Model.Article.ArticleId ,ParentId=Guid.Empty }); }
+                </div>
 
+                <div class="contant" style="width: 886px;position: relative;top: -109px;">
+                    @{
+                        foreach (var maincommentview in Model.MainComments)
+                        {
+                            <partial name="_CommentView" model="maincommentview"/>
+                        }
+                    }
+                </div>
+
+            </div>
+        <!-- Modal -->
+        <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Are you sure??</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                 <p>You are about to delete this Article!!!!</p>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal"asp-controller="Home" asp-action="Article"  asp-route-id="@Model.Article.ArticleId">Close</button>
+                <form method="post" asp-action="RemoveArticle" asp-controller="Home">
+                    <input type="hidden" name="id" value="@Model.Article.ArticleId"/>
+                    <input type="submit" value="Delete" class="btn btn-primary btn-danger" /> 
+                </form>
+              </div>
+            </div>
+          </div>
         </div>
-<!-- Modal -->
-<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLongTitle">Are you sure??</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-         <p>You are about to delete this Article!!!!</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal"asp-controller="Home" asp-action="Article"  asp-route-id="@Model.Article.ArticleId">Close</button>
-        <form method="post" asp-action="RemoveArticle" asp-controller="Home">
-            <input type="hidden" name="id" value="@Model.Article.ArticleId"/>
-            <input type="submit" value="Delete" class="btn btn-primary btn-danger" /> 
-        </form>
-      </div>
     </div>
-  </div>
-</div>
 
-        
-
-        <!--########################### End Remove##########################-->
-
-      </div>
-<!--########################### End icon##########################-->
-
-    
- @*   <div class="container" style="position: relative;top: -41px;right: -92px;">  <div class="topics-column">  <div class="back">
-            <a asp-action="Index"> &lt;&lt; Back to List</a>
-        </div>*@
-     @* <div id="topic-and-comments-container" class="topic-and-comments-container theme">
-        <div id="cristians-topic" class="topic-container">
-          <div class="topic-content-container">
-
-                               
-
-              <div class="topic-title-container">
-                <p class="topic-title">@Html.DisplayFor(model => model.Article.Title)
-                </p>
-                <p class="topic-title">@Html.DisplayFor(model => model.Article.GenreName)
-                </p>
-                <p class="topic-title">@Html.DisplayFor(model => model.Article.Level)
-                </p>
-                <p class="topic-title">@Html.DisplayFor(model => model.Article.Categories)
-                </p>
-              </div>
-              <br>
-              <div class="topic-description-container">
-                <p class="topic-description">@Html.DisplayFor(model => model.Article.Description)
-                </p>
-                 <p class="topic-description">@Html.DisplayFor(model => model.Article.Content)
-                </p>
-              </div>
-              <hr>
-
-            
-          </div>
-        </div>*@
-        
-          @*  <div class="Createcomment-div">
-               @{ await Html.RenderPartialAsync("_CreateComment", new Comment { ArticleId = Model.Article.ArticleId, ParentId= Guid.Empty }); }
-            </div>
-            
-
-        <div id="comment-container" class="comment-container">
-          @foreach (var commentViewModel in Model.MainComments)
-
-          {
-          <div class="comment theme">
-            <div class="profile-column">
-              <i class="fas fa-user"></i>
-              <div class="line">
-                <!-- This is the line -->
-              </div>
-            </div>
-            <div class="parent-comment-contents">
-              <div class="user-info">
-                <p class="">@Html.DisplayFor(modelItem => commentViewModel.Creator.FirstName)</p>
-                <p>&#8226;</p>
-                <p>@Html.DisplayFor(modelItem => commentViewModel.Comment.Created)</p>
-              </div>
-              <div>
-                <p>@Html.DisplayFor(modelItem =>  commentViewModel.Comment.Message)</p>
-              </div>
-             
-              
-                @{
-                    await Html.RenderPartialAsync("_SubComments", commentViewModel.Comment);
-                }
-            
-                    <div style="margin-bottom:20px;">
-                        
-                        @{await Html.RenderPartialAsync("_CreateComment", new Comment { ArticleId = Model.Article.ArticleId, ParentId=  commentViewModel.Comment.CommentId });}
-                    </div>
-                
-            </div>
-          </div>
-          } 
-        </div>
-        <br>
-      </div>
-    </div>*@
- @*   <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous"asp-append-version="true" >
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>*@
     <link rel="stylesheet" href="~/HomeStyle/assets/css/style.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Article/css/style.css"asp-append-version="true" />
     <link rel="stylesheet" href="~/Article/css/font.css"asp-append-version="true" />

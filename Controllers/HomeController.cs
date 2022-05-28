@@ -397,7 +397,7 @@ public class HomeController : Controller
             return RedirectToAction("Article", new { id = ArticleId });
         }
 
-        TempData["Message"] = "warning: The article you are trying to like is not exist";
+        TempData["Message"] = "warning: The article you are trying to Recommend is not exist";
         return RedirectToAction("Index");
     }
 
